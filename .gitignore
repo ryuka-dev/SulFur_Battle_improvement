@@ -7,3 +7,7 @@ obj/
 # obtained/rebuilt separately; libs/ holds prebuilt third-party binaries (UrGUI.dll).
 Assets/
 libs/
+
+# Thunderstore packaging: built binaries and packaged archives, not committed.
+thunderstore/*.dll
+thunderstore/*.zip

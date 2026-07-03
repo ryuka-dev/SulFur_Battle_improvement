@@ -31,6 +31,7 @@ Enables the health bar in the dev tools.
 
 Every time you gain some experience on current weapon, your second weapon will also gain some experience.
 
+Reverse mouse scroll.
 
 ## Configurable
 - In Game config menu, default open key is F1
