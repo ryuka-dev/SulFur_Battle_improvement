@@ -58,3 +58,16 @@ Loot VFX now fixde to const size
 
 ## 1.5.1
 v0.11.2 compatibility fix.
+
+## 1.5.2
+Compatibility fix for the current SULFUR build (Unity 6).
+
+Combat feedback (hit marker, damage numbers, kill message, hit sound) rewired to the reworked damage pipeline.
+
+Bullets-through-corpses and reverse mouse scroll restored.
+
+Kill message / damage text render again, using the game's own font (CJK included).
+
+F1 menu fixed for the new input system.
+
+Fixed a save-migration error that could abort plugin init.
