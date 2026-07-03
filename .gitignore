@@ -1,0 +1,9 @@
+_decompiled/
+bin/
+obj/
+
+# Copyrighted / binary build inputs — supply these locally, never commit them.
+# Assets/battle_improve is the custom AssetBundle (UI art + kill sounds) and must be
+# obtained/rebuilt separately; libs/ holds prebuilt third-party binaries (UrGUI.dll).
+Assets/
+libs/

@@ -26,7 +26,7 @@ public class HealthBarPatch {
     }
 
     [HarmonyPostfix, HarmonyPatch(typeof(Npc), "Start")]
-    private static void AddDebugFrame(Player __instance) {
+    private static void AddDebugFrame(Npc __instance) {
         __instance.gameObject.AddComponent<HealthBar>();
     }
 }

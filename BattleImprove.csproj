@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <AssemblyName>BattleImprove</AssemblyName>
+        <Product>Battle Improvements</Product>
+        <Version>1.5.2</Version>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <LangVersion>latest</LangVersion>
+        <RootNamespace>BattleImprove</RootNamespace>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <NoWarn>$(NoWarn);CS0618</NoWarn>
+        <RestoreAdditionalProjectSources>
+            https://api.nuget.org/v3/index.json;
+            https://nuget.bepinex.dev/v3/index.json
+        </RestoreAdditionalProjectSources>
+        <!-- Path to the game's Managed folder. Override on the CLI with -p:SulfurManaged=... if your install differs. -->
+        <SulfurManaged Condition="'$(SulfurManaged)' == ''">D:\SteamLibrary\steamapps\common\SULFUR\Sulfur_Data\Managed</SulfurManaged>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+        <PackageReference Include="BepInEx.Core" Version="5.*" />
+        <PackageReference Include="BepInEx.PluginInfoProps" Version="2.*" />
+    </ItemGroup>
+
+    <!-- Reference the game's own Unity + engine assemblies so we compile against the exact versions the game ships. -->
+    <ItemGroup>
+        <Reference Include="$(SulfurManaged)\UnityEngine*.dll" Private="false" />
+        <Reference Include="$(SulfurManaged)\Unity.*.dll" Private="false" />
+        <Reference Include="$(SulfurManaged)\PerfectRandom.Sulfur.Core.dll" Private="false" />
+        <Reference Include="$(SulfurManaged)\PerfectRandom.Sulfur.Gameplay.dll" Private="false" />
+        <Reference Include="$(SulfurManaged)\Sonity.Public.Runtime.dll" Private="false" />
+        <Reference Include="$(SulfurManaged)\EasySave3.dll" Private="false" />
+        <Reference Include="libs\UrGUI.dll" Private="true" />
+    </ItemGroup>
+
+    <!-- Embedded resources (logical names must match the runtime lookups in PrefabManager / LocalizationManager). -->
+    <ItemGroup>
+        <EmbeddedResource Include="Assets\battle_improve" LogicalName="BattleImprove.Assets.battle_improve" />
+        <EmbeddedResource Include="Lang\English.lang" LogicalName="BattleImprove.Lang.English.lang" />
+        <EmbeddedResource Include="Lang\ChineseSimplified.lang" LogicalName="BattleImprove.Lang.ChineseSimplified.lang" />
+    </ItemGroup>
+
+    <!-- Keep the decompiled game source and scratch out of the build. -->
+    <ItemGroup>
+        <Compile Remove="_decompiled\**\*.cs" />
+        <Compile Remove="UI\UrGUI\**\*.cs" />
+    </ItemGroup>
+
+</Project>

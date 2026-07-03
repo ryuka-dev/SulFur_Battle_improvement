@@ -36,10 +36,10 @@ public class DeadProtection {
             Plugin.LoggingInfo("Durability Modified: " + inventoryItem.DurabilityCurrent);
             
             Plugin.LoggingInfo("Grabbing item data...");
-            var InventoryData = new InventoryData(itemdef.identifier, inventoryItem.gridPosition.x, inventoryItem.gridPosition.y, inventoryItem.quantity, 
-                inventoryItem.currentAmmo, inventoryItem.CurrentCaliber.identifier, inventoryItem.stats.SerializedAttributeData(),   
-                inventoryItem.GetSerializedAttachments(), inventoryItem.GetSerializedEnchantments(), 
-                inventoryItem.InventorySize.x, inventoryItem.InventorySize.y, false, false);
+            var InventoryData = new InventoryData(itemdef.id, inventoryItem.gridPosition.x, inventoryItem.gridPosition.y, inventoryItem.quantity,
+                inventoryItem.currentAmmo, inventoryItem.CurrentCaliber, inventoryItem.stats.SerializedAttributeData(),
+                inventoryItem.GetSerializedAttachments(), inventoryItem.GetSerializedEnchantments(),
+                0, inventoryItem.InventorySize.x, inventoryItem.InventorySize.y, false, false);
             
             Plugin.LoggingInfo("Saving item data...");
             weapons.Add(InventoryData);

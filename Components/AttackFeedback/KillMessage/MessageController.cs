@@ -102,6 +102,9 @@ public class MessageController : PluginInstance<MessageController> {
     }
     
     public virtual void OnEnemyKill(string enemyName, string weaponName, string exp, bool isHeadShot, bool isFar = false) {
+        // The localized (CJK) game font may only become available once gameplay UI is up; retry until locked.
+        if (!TmpFontFixer.Resolved) TmpFontFixer.Apply(this.gameObject);
+
         tmpEnemyName.text = enemyName;
         tmpWeaponName.text = weaponName;
         tmpExp.text = exp;
@@ -112,6 +115,8 @@ public class MessageController : PluginInstance<MessageController> {
     }
 
     public void OnEnemyHit(string type, int damage) {
+        if (!TmpFontFixer.Resolved) TmpFontFixer.Apply(this.gameObject);
+
         gameobjectTotalDamage.SetActive(true);
         totalDamage += damage;
         
@@ -198,8 +203,9 @@ public class MessageController : PluginInstance<MessageController> {
     
     protected virtual GameObject GetDamageInfo(string type, int damage, GameObject placeholder) {
         var damageInfo = Instantiate(damageSourcePrefab, damageInfoContainer.transform);
+        TmpFontFixer.Apply(damageInfo);
         damageInfo.GetComponent<DamageSource>().InitMessage(type, damage, placeholder);
-        
+
         return damageInfo;
     }
 

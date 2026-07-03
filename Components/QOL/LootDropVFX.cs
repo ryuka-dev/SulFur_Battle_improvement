@@ -23,7 +23,7 @@ public class LootDropVFX : MonoBehaviour{
     }
 
     private void Update() {
-        bool isPressed = Input.GetMouseButton(1);
+        bool isPressed = BattleImprove.Utils.InputCompat.GetMouseButton(1);
         foreach (var system in systems) {
             system.gameObject.SetActive(!isPressed);
         }

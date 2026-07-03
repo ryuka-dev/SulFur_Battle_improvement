@@ -22,8 +22,13 @@ public class LootDropPatch {
         }
         
         
-        var shadow = __instance.transform.Find("Shadow").gameObject;
-        // Object.Destroy(shadow.GetComponent<DecalProjector>());
+        // Pickup exposes its shadow Transform directly now; fall back to the old name lookup just in case.
+        var shadowTransform = __instance.shadow != null ? __instance.shadow : __instance.transform.Find("Shadow");
+        if (shadowTransform == null) {
+            Plugin.LoggingInfo("LootDropPatch: pickup has no shadow transform, skipping VFX parent.");
+            return;
+        }
+        var shadow = shadowTransform.gameObject;
         
         var quality = __instance.ItemSO.itemQuality;
         var lootDropVFX = quality switch {

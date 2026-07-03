@@ -56,13 +56,15 @@ public static class PrefabManager {
     
     internal static void LoadAttackFeedbackPrefab() {
         Plugin.IndicatorGameObject = LoadPrefab("AttackFeedback", Plugin.PluginGameObject);
+        TmpFontFixer.Apply(Plugin.IndicatorGameObject);
         LoadKillMessageStyle(DataManager.KillMessageStyle[DataManager.AttackFeedbackData.messageStyle]);
     }
-    
+
     internal static void LoadKillMessageStyle(string style = "Battlefield 1") {
         if (PluginInstance<MessageController>.Instance != null) {
             Object.Destroy(PluginInstance<MessageController>.Instance.gameObject);
         }
-        LoadPrefab(style, Plugin.IndicatorGameObject);
+        var styleObject = LoadPrefab(style, Plugin.IndicatorGameObject);
+        TmpFontFixer.Apply(styleObject);
     }
 }

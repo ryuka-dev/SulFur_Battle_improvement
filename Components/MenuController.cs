@@ -24,7 +24,7 @@ public class MenuController : PluginInstance<MenuController> {
     }
     
     public void Update() {
-        if(Input.GetKeyDown(menuKey)) {
+        if(InputCompat.GetKeyDown(menuKey)) {
             ToggleMenu();
         }
     }
@@ -80,8 +80,8 @@ public class MenuController : PluginInstance<MenuController> {
     public void Pause(bool state) {
         var manager = StaticInstance<GameManager>.Instance;
         if (manager == null) return;
-        manager.ModifyCursorState(GameManager.ControllerLockState.Paused, state);
-        manager.ModifyControllerLock(GameManager.ControllerLockState.Paused, state);
+        manager.ModifyCursorState(LockStatePadlock.Paused, state);
+        manager.ModifyControllerLock(LockStatePadlock.Paused, state);
     }
     
     public void OpenSubWindow(string name, bool closeCurrent = true) {

@@ -93,11 +93,11 @@ public class WindowAttackFeedback : WindowBase{
     }
 
     private void TestKillMessage() {
-        PluginInstance<MessageController>.Instance.OnEnemyKill("Enemy Name#" + Random.RandomRangeInt(0, 10)
-            , "Weapon Name#" + Random.RandomRangeInt(0, 10)
-            , Random.RandomRangeInt(0, 10).ToString()
-            , Random.RandomRangeInt(0, 10) < 5
-            , Random.RandomRangeInt(0, 10) < 5);
-        PluginInstance<MessageController>.Instance.OnEnemyHit("Bullet Damage Type#" + Random.RandomRangeInt(0, 10), Random.RandomRangeInt(0, 100));
+        PluginInstance<MessageController>.Instance.OnEnemyKill("Enemy Name#" + Random.Range(0, 10)
+            , "Weapon Name#" + Random.Range(0, 10)
+            , Random.Range(0, 10).ToString()
+            , Random.Range(0, 10) < 5
+            , Random.Range(0, 10) < 5);
+        PluginInstance<MessageController>.Instance.OnEnemyHit("Bullet Damage Type#" + Random.Range(0, 10), Random.Range(0, 100));
     }
 }

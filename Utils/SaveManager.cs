@@ -9,12 +9,17 @@ public static class SaveManager {
     public const string SaveFileName = "BattleImproveSaveData";
 
     public static void LoadSaveFile() {
+        // Legacy migration: very old versions stored plugin data inside the vanilla save file.
+        // This is best-effort and must never abort plugin initialization if it fails.
         try {
-            
-            if (ES3.KeyExists("CmPlugin", SulfurSave.Imp.saveSettings)) {
+            if (SulfurSave.Imp?.saveSettings != null && ES3.KeyExists("CmPlugin", SulfurSave.Imp.saveSettings)) {
                 TransferSaveData();
-            } 
-            
+            }
+        } catch (Exception e) {
+            Plugin.LoggingInfo("Vanilla-save migration check skipped: " + e.Message);
+        }
+
+        try {
             if (ES3.FileExists(SaveFileName)) {
                 LoadAll();
             } else {
@@ -25,8 +30,8 @@ public static class SaveManager {
         } catch (Exception e) {
             Console.WriteLine(e);
             Plugin.LoggingInfo("Failed to load save data, creating new one...");
+            // Do NOT rethrow: the rest of plugin init (AttackFeedback prefab, menu) must still run.
             LoadDefaults();
-            throw;
         }
     }
 

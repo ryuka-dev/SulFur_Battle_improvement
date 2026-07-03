@@ -1,4 +1,3 @@
-﻿using System;
 using System.Linq;
 using BattleImprove.Utils;
 using HarmonyLib;
@@ -10,38 +9,36 @@ using UnityEngine;
 namespace BattleImprove.Patcher.TakeHitPatcher;
 
 [HarmonyWrapSafe]
-[HarmonyPatch(typeof(Hitbox), "TakeHit", new Type[] {typeof(float), typeof(DamageType), typeof(DamageSourceData), typeof(Vector3)})]
+[HarmonyPatch(typeof(Npc), "ReceiveDamage",
+    new[] { typeof(float), typeof(DamageTypes), typeof(DamageSourceData), typeof(Hitmesh.Data), typeof(Vector3?) })]
 public class SoundPatch {
     private static PluginData.AttackFeedback data;
-    
-    private static void Postfix(Hitbox __instance, DamageType damageType, Vector3 collisionPoint) {
+
+    private static void Postfix(Npc __instance, DamageTypes damageType, ref DamageSourceData source, Hitmesh.Data hitbox, Vector3? hitPosition) {
         if (PluginInstance<HitSoundEffect>.Instance == null) return;
+        // Only play the hit sound for the player's own hits.
+        if (source.sourceUnit == null || !source.sourceUnit.isPlayer) return;
+
         data ??= DataManager.AttackFeedbackData;
-        
-        if (__instance.Owner is Breakable || __instance.Owner.isPlayer) return;
 
-        var target = __instance.GetOwner().gameObject.GetComponent<Npc>();
-
-        if (target.UnitState == UnitState.Dead) return;
-        if (!AttackFeedbackPatch.Enemies.Contains(target)) return;
+        if (__instance.UnitState == UnitState.Dead) return;
+        if (AttackFeedbackPatch.Enemies == null || !AttackFeedbackPatch.Enemies.Contains(__instance)) return;
 
         var player = StaticInstance<GameManager>.Instance.PlayerUnit;
-        var distance = Vector3.Distance(player.EyesPosition
-            , target.transform.position);
+        var collisionPoint = hitPosition ?? __instance.transform.position;
+        var distance = Vector3.Distance(player.EyesPosition, __instance.transform.position);
 
-        
-        if (damageType.id == DamageTypes.Critical || __instance.bodyPart.label == "Head") {
+        var isHeadshot = hitbox.shapeId.part == HitboxColliders.Parts.Head;
+
+        if (damageType == DamageTypes.Critical || isHeadshot) {
             var soundPosition = Vector3.LerpUnclamped(player.transform.position, collisionPoint, data.indicatorDistanceHeadShoot);
             PluginInstance<HitSoundEffect>.Instance.PlayHitSound(soundPosition, true, volume: data.indicatorVolume);
-        }
-        else {
-            if (distance < 20) {
-                var soundPosition = Vector3.LerpUnclamped(player.transform.position, collisionPoint, data.indicatorDistance);
-                PluginInstance<HitSoundEffect>.Instance.PlayHitSound(soundPosition, false, volume: data.indicatorVolume);
-            }else {
-                var soundPosition = Vector3.LerpUnclamped(player.transform.position, collisionPoint, data.indicatorDistanceFar);
-                PluginInstance<HitSoundEffect>.Instance.PlayHitSound(soundPosition, false, true, volume: data.indicatorVolume);
-            }
+        } else if (distance < 20) {
+            var soundPosition = Vector3.LerpUnclamped(player.transform.position, collisionPoint, data.indicatorDistance);
+            PluginInstance<HitSoundEffect>.Instance.PlayHitSound(soundPosition, false, volume: data.indicatorVolume);
+        } else {
+            var soundPosition = Vector3.LerpUnclamped(player.transform.position, collisionPoint, data.indicatorDistanceFar);
+            PluginInstance<HitSoundEffect>.Instance.PlayHitSound(soundPosition, false, true, volume: data.indicatorVolume);
         }
     }
 }

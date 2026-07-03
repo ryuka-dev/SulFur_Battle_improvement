@@ -27,10 +27,13 @@ public class LootSpawnHelper : PluginInstance<LootSpawnHelper> {
     private IEnumerator SpawnWeapon(List<InventoryData> weapons, Transform transform) {
         
         foreach (var item in weapons) {
-            var itemDef = StaticInstance<LootManager>.Instance.GetItem(item.identifier);
-            item.attachments = RandomDeleteElement(item.attachments, data.attachmentChance);
-            item.enchantments = RandomDeleteElement(item.enchantments, data.enchantmentChance);
-            item.caliber = RandomDeleteElement(new []{item.caliber}, data.barrelChance)[0];
+            var itemDef = item.id.GetAsset();
+            item.attachmentIds = RandomDeleteElement(item.attachmentIds, data.attachmentChance);
+            item.enchantmentIds = RandomDeleteElement(item.enchantmentIds, data.enchantmentChance);
+            // barrelChance: chance to lose the modded caliber and revert to the weapon's default.
+            if (item.caliberId != CaliberTypes.None && Random.Range(0f, 1f) < data.barrelChance) {
+                item.caliberId = CaliberTypes.None;
+            }
 
             var room = StaticInstance<GameManager>.Instance.PlayerUnit.currentRoom;
             
@@ -47,8 +50,9 @@ public class LootSpawnHelper : PluginInstance<LootSpawnHelper> {
         }
     }
     
-    private string[] RandomDeleteElement(string[] array, float chance) {
-        var list = new List<string>(array);
+    private ItemId[] RandomDeleteElement(ItemId[] array, float chance) {
+        if (array == null) return null;
+        var list = new List<ItemId>(array);
 
         foreach (var element in list.ToList()) {
             var num = Random.Range(0f, 1f);
