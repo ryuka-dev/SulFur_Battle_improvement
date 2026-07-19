@@ -1,7 +1,7 @@
 {
     "name": "BattleImprovements_fix",
-    "version_number": "1.5.2",
-    "website_url": "https://github.com/CmmmmmmLau/SulFur_Battle_improvement",
+    "version_number": "1.5.3",
+    "website_url": "https://github.com/ryuka-dev/SulFur_Battle_improvement",
     "description": "Make the battle experience of Sulfur be better. Hit marker, Loot light beam, dead protection and more!",
     "dependencies": [
         "BepInEx-BepInExPack-5.4.2100"

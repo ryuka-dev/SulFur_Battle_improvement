@@ -4,7 +4,7 @@
         <TargetFramework>netstandard2.1</TargetFramework>
         <AssemblyName>BattleImprove</AssemblyName>
         <Product>Battle Improvements</Product>
-        <Version>1.5.2</Version>
+        <Version>1.5.3</Version>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <LangVersion>latest</LangVersion>
         <RootNamespace>BattleImprove</RootNamespace>
@@ -47,5 +47,12 @@
         <Compile Remove="_decompiled\**\*.cs" />
         <Compile Remove="UI\UrGUI\**\*.cs" />
     </ItemGroup>
+
+    <!-- Stage the freshly built plugin and its bundled dependency into the Thunderstore package folder so
+         the packaging step zips the current build, not a stale copy. Enabled with -p:DeployToSulfurProfile=true. -->
+    <Target Name="DeployToThunderstore" AfterTargets="Build" Condition="'$(DeployToSulfurProfile)' == 'true'">
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)\thunderstore" />
+        <Copy SourceFiles="$(MSBuildProjectDirectory)\libs\UrGUI.dll" DestinationFolder="$(MSBuildProjectDirectory)\thunderstore" />
+    </Target>
 
 </Project>

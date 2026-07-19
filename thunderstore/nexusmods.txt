@@ -1,0 +1,159 @@
+[font=Arial Black][color=DarkOrange][size=5][b]Battle Improvements[/b][/size][/color][/font]
+Add some feature to improve the sulfur's battle experience
+
+[img]https://raw.githubusercontent.com/CmmmmmmLau/SulFur_Battle_improvement/refs/heads/master/docs/preview.png[/img]
+
+[color=RoyalBlue][b]Maintenance status[/b][/color]
+This is a temporary maintenance fork. The original author has been contacted, and this fork provides interim maintenance to keep the mod working on the current SULFUR build. It is temporary by design: once the original author ships an official update, this fork will be retired in favor of it.
+
+[color=RoyalBlue][b]Features[/b][/color]
+All features can be turned off by cfg in BepInEx/Config folder
+
+Battlefield 1/5 style kill message
+
+[img]https://github.com/CmmmmmmLau/SulFur_Battle_improvement/blob/master/docs/killmessage.gif?raw=true[/img]
+
+Loot drop effect, never miss your loot again.
+
+[img]https://github.com/CmmmmmmLau/SulFur_Battle_improvement/blob/master/docs/lootdrop_vfx.gif?raw=true[/img]
+
+You can get your weapons back from the donation box.
+
+Of course... you have to lose something...
+
+[img]https://raw.githubusercontent.com/CmmmmmmLau/SulFur_Battle_improvement/refs/heads/master/docs/deadprotection.gif[/img]
+
+Bullet behavior reworked. Now your bullets won't be blocked by dead body, and neither will theirs.
+
+[img]https://github.com/CmmmmmmLau/SulFur_Battle_improvement/blob/master/docs/deadbodycollision.gif?raw=true[/img]
+
+Enables the health bar in the dev tools.
+
+Every time you gain some experience on current weapon, your second weapon will also gain some experience.
+
+Reverse mouse scroll.
+
+[color=RoyalBlue][b]Configurable[/b][/color]
+[list]
+[*]In Game config menu, default open key is F1[/*]
+[*]Volume and distance of the hit sound.[/*]
+[*]Color of the hitmarker.[/*]
+[*]Volume of the kill message.[/*]
+[*]How many weapon durability you will lose when you get your weapon back.[/*]
+[*]The chance of the attachment and enhancement will be lost when you get your weapon back.[/*]
+[/list]
+[color=RoyalBlue][b]Game Compatibility[/b][/color]
+[b]Only Latest version of Sulfur is supported.[/b]
+For older version, please try the older released mod.
+
+[color=RoyalBlue][b]Manual Installation[/b][/color]
+[list=1]
+[*]Download ant install the bepinex 5 from [url=https://github.com/BepInEx/BepInEx/releases/tag/v5.4.23.2]github[/url][/*]
+[*]Download this mod from github [url=https://github.com/CmmmmmmLau/SulFur_Battle_improvement/releases]release page[/url][/*]
+[*]Unzip the file in `[color=#ffff00]SULFUR\BepInEx\plugins\[/color]` folder.[/*]
+[*]Enjoy[/*]
+[/list]
+[color=RoyalBlue][b]What's Next?[/b][/color]
+[list]
+[*]~~Death Protection~~ Done[/*]
+[*]~~battlefield 5 style~~ Done[/*]
+[*]~~Loot light beam~~ Done[/*]
+[*]Remove Friendly Fire[/*]
+[/list]
+[font=Arial Black][color=DarkOrange][size=5][b]Know Issue[/b][/size][/color][/font]
+Currently only able to record player's bullet damage. Other type of damage date not include the damage source, therefore it will take more work to try to record it.
+
+[font=Arial Black][color=DarkOrange][size=5][b]Copyright[/b][/size][/color][/font]
+Audio/Texture: Electronic Arts, DICE
+
+UI library: Hirashi3630/UrGUI
+
+[font=Arial Black][color=DarkOrange][size=5][b]Changelog[/b][/size][/color][/font]
+
+[color=RoyalBlue][b]1.5.3[/b][/color]
+Compatibility fix for SULFUR 0.18.5.
+
+Combat feedback (hit marker, damage numbers, kill message, hit sound) rewired to the reworked damage pipeline (ReceiveDamage signature changed).
+
+Fixed loot VFX and dead protection failing to start on the new save system.
+
+Dead Protection now defaults to off: SULFUR 0.18.5 has a built-in insured-items system (church collection) that already returns your gear on death. Existing configs are left as-is; turn it on again if you want the mod's version.
+
+Fixed a per-kill stutter caused by repeated font lookups when the game runs in a non-CJK language.
+
+[color=RoyalBlue][b]1.5.2[/b][/color]
+Compatibility fix for the current SULFUR build (Unity 6).
+
+Combat feedback (hit marker, damage numbers, kill message, hit sound) rewired to the reworked damage pipeline.
+
+Bullets-through-corpses and reverse mouse scroll restored.
+
+Kill message / damage text render again, using the game's own font (CJK included).
+
+F1 menu fixed for the new input system.
+
+Fixed a save-migration error that could abort plugin init.
+
+[color=RoyalBlue][b]1.5.1[/b][/color]
+v0.11.2 compatibility fix.
+
+[color=RoyalBlue][b]1.5.0[/b][/color]
+v0.10.12 compatibility fix.
+Barrel also in dead proection now
+Loot VFX now fixde to const size
+
+[color=RoyalBlue][b]1.4.3[/b][/color]
+v0.10.4 compatibility fix.
+
+[color=RoyalBlue][b]1.4.2[/b][/color]
+Corrected the death protection logic to match the textual description, i.e. the value is now set to the chance of losing enchantments and accessories instead of the chance of keeping them.
+
+[color=RoyalBlue][b]1.4.1[/b][/color]
+v0.10.2 compatibility fix.
+
+[color=RoyalBlue][b]1.4.0[/b][/color]
+v0.10.1 compatibility fix.
+
+fix when player die with grenade will cause game soft lock
+
+Add battlefield 5 style kill message
+
+[color=RoyalBlue][b]1.3.0[/b][/color]
+Add Dead Protection
+
+Bullet behavior reworked
+
+[color=RoyalBlue][b]1.2.0[/b][/color]
+
+Add loot beams
+
+[color=RoyalBlue][b]1.1.0[/b][/color]
+
+Add Menu
+
+Add i18n
+
+Add configurable feature - all configurations will save into game save file
+
+Code Refactoring - Further split attack feedback related patches into different patches
+
+[color=RoyalBlue][b]1.0.4[/b][/color]
+Updated v0.9.17 compatibility.
+
+Hit crosshair animation adjust
+
+[color=RoyalBlue][b]1.0.3[/b][/color]
+Now asset bundle embedded with dll file
+
+Bug fix: damage count only trigger when kill enemy
+
+[color=RoyalBlue][b]1.0.2[/b][/color]
+Speed up the kill message animation
+
+Add configurable file for all feature to turn on/off
+
+[color=RoyalBlue][b]1.0.1[/b][/color]
+Now damage info will merged if have same damage type
+
+[color=RoyalBlue][b]1.0.0[/b][/color]
+Release
