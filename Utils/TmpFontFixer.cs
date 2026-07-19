@@ -20,6 +20,15 @@ public static class TmpFontFixer {
     // Common characters across CJK locales; if a font can draw one of these it can render localized names.
     private static readonly char[] CjkProbe = { '号', '击', '杀', '测', '的' };
 
+    // The scans in ResolveGameFont (FindObjectsOfType / FindObjectsOfTypeAll) are expensive. Until a
+    // CJK-capable font is locked, throttle re-scans so they never run on the per-hit/per-kill hot path,
+    // and give up entirely after a budget so a non-CJK locale (no CJK font on screen, ever) does not
+    // keep scanning forever on every kill.
+    private static float _nextScanTime;
+    private static float _giveUpTime = -1f;
+    private const float ScanIntervalSeconds = 3f;
+    private const float GiveUpAfterSeconds = 15f;
+
     /// <summary>True once we've locked onto a CJK-capable game font and no longer need to retry.</summary>
     public static bool Resolved { get; private set; }
 
@@ -42,6 +51,12 @@ public static class TmpFontFixer {
     private static TMP_FontAsset ResolveGameFont() {
         if (Resolved && _gameFont != null) return _gameFont;
 
+        // Already have a (provisional) font and it isn't time to re-scan yet: reuse it. This keeps the
+        // expensive scans below off the kill/hit path when the CJK font never resolves (e.g. Latin locale).
+        if (_gameFont != null && Time.unscaledTime < _nextScanTime) return _gameFont;
+        _nextScanTime = Time.unscaledTime + ScanIntervalSeconds;
+        if (_giveUpTime < 0f) _giveUpTime = Time.unscaledTime + GiveUpAfterSeconds;
+
         // 1) Best: the font a live game text is using right now to render CJK on screen.
         foreach (var t in UnityEngine.Object.FindObjectsOfType<TMP_Text>()) {
             var f = t != null ? t.font : null;
@@ -61,6 +76,13 @@ public static class TmpFontFixer {
             }
             if (_gameFont == null) _gameFont = TMP_Settings.defaultFontAsset;
             Plugin.LoggingInfo("TmpFontFixer: provisional font '" + Name(_gameFont) + "' (CJK not found yet, will retry).", true);
+        }
+
+        // Budget elapsed with no CJK font in sight: this is a non-CJK locale. Lock the provisional font
+        // permanently so the expensive scans above never run again (they were the per-kill stutter).
+        if (_gameFont != null && Time.unscaledTime >= _giveUpTime) {
+            Resolved = true;
+            Plugin.LoggingInfo("TmpFontFixer: no CJK font found within budget; locked '" + Name(_gameFont) + "'.", true);
         }
         return _gameFont;
     }
