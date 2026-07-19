@@ -10,13 +10,13 @@ namespace BattleImprove.Patcher.TakeHitPatcher;
 
 [HarmonyWrapSafe]
 [HarmonyPatch(typeof(Npc), "ReceiveDamage",
-    new[] { typeof(float), typeof(DamageTypes), typeof(DamageSourceData), typeof(Hitmesh.Data), typeof(Vector3?) })]
+    new[] { typeof(float), typeof(DamageSourceData), typeof(Hitmesh.Data), typeof(Vector3?) })]
 public class DamageInfoPatch : AttackFeedbackPatch {
     private static void Prefix(Npc __instance, out float __state) {
         __state = __instance.GetCurrentHealth();
     }
 
-    private static void Postfix(Npc __instance, DamageTypes damageType, ref DamageSourceData source, float __state) {
+    private static void Postfix(Npc __instance, ref DamageSourceData source, float __state) {
         if (PluginInstance<MessageController>.Instance == null) return;
         if (!TargetCheck(source)) return;
 
@@ -30,7 +30,7 @@ public class DamageInfoPatch : AttackFeedbackPatch {
         if (source.melee && def != null) {
             type = def.LocalizedDisplayName;
         } else {
-            type = damageType.GetAsset() != null ? damageType.GetAsset().shortLabel : damageType.ToString();
+            type = source.damageType.GetAsset() != null ? source.damageType.GetAsset().shortLabel : source.damageType.ToString();
             if (def != null) {
                 var caliber = def.caliber.GetAsset();
                 type += " " + (caliber != null ? caliber.label : def.caliber.ToString()) + " " + def.projectileType;

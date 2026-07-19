@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using HarmonyLib;
-using PerfectRandom.Sulfur.Core;
 
 namespace BattleImprove.Utils;
 
@@ -9,16 +6,9 @@ public static class SaveManager {
     public const string SaveFileName = "BattleImproveSaveData";
 
     public static void LoadSaveFile() {
-        // Legacy migration: very old versions stored plugin data inside the vanilla save file.
-        // This is best-effort and must never abort plugin initialization if it fails.
-        try {
-            if (SulfurSave.Imp?.saveSettings != null && ES3.KeyExists("CmPlugin", SulfurSave.Imp.saveSettings)) {
-                TransferSaveData();
-            }
-        } catch (Exception e) {
-            Plugin.LoggingInfo("Vanilla-save migration check skipped: " + e.Message);
-        }
-
+        // The legacy vanilla-save migration (very old versions stored plugin data inside the game's
+        // Profile save via SulfurSave.Imp) was removed: 0.18.5 replaced that save API entirely, so the
+        // old data is unreachable. The plugin has kept its own ES3 file (SaveFileName) for many releases.
         try {
             if (ES3.FileExists(SaveFileName)) {
                 LoadAll();
@@ -75,30 +65,6 @@ public static class SaveManager {
         ES3.Save("DeadProtection", DataManager.DeadProtectionData, SaveManager.SaveFileName);
     }
 
-    private static void TransferSaveData() {
-        Plugin.LoggingInfo("Save data found in the vanilla save file, transfers it to the new file...");
-        var dataDict = SulfurSave.Imp.Load("CmPlugin", new Dictionary<string, PluginData>());
-        ES3.DeleteKey("CmPlugin", SulfurSave.Imp.saveSettings);
-
-        var data1 = dataDict["BattleImprove"] as PluginData.Version;
-        Traverse.IterateFields(data1, RoundUp);
-        ES3.Save("BattleImprove", data1, SaveManager.SaveFileName);
-        
-        var data2 = dataDict["AttackFeedback"] as PluginData.AttackFeedback;
-        Traverse.IterateFields(data2, RoundUp);
-        ES3.Save("AttackFeedback", data2, SaveManager.SaveFileName);
-        
-        var data3 = dataDict["DeadProtection"] as PluginData.DeadProtection;
-        Traverse.IterateFields(data3, RoundUp);
-        ES3.Save("DeadProtection", data3, SaveManager.SaveFileName);
-    }
-
-    private static void RoundUp(Traverse traverse) {
-        if (traverse.GetValue() is float value) {
-            traverse.SetValue(MathF.Round(value, 2));
-        }
-    }
-    
     private static void LoadDefaults() {
         ES3.Save("BattleImprove", new PluginData.Version(), SaveFileName);
         ES3.Save("AttackFeedback", new PluginData.AttackFeedback(), SaveFileName);

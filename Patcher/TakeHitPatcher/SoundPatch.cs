@@ -10,11 +10,11 @@ namespace BattleImprove.Patcher.TakeHitPatcher;
 
 [HarmonyWrapSafe]
 [HarmonyPatch(typeof(Npc), "ReceiveDamage",
-    new[] { typeof(float), typeof(DamageTypes), typeof(DamageSourceData), typeof(Hitmesh.Data), typeof(Vector3?) })]
+    new[] { typeof(float), typeof(DamageSourceData), typeof(Hitmesh.Data), typeof(Vector3?) })]
 public class SoundPatch {
     private static PluginData.AttackFeedback data;
 
-    private static void Postfix(Npc __instance, DamageTypes damageType, ref DamageSourceData source, Hitmesh.Data hitbox, Vector3? hitPosition) {
+    private static void Postfix(Npc __instance, ref DamageSourceData source, Hitmesh.Data hitbox, Vector3? hitPosition) {
         if (PluginInstance<HitSoundEffect>.Instance == null) return;
         // Only play the hit sound for the player's own hits.
         if (source.sourceUnit == null || !source.sourceUnit.isPlayer) return;
@@ -30,7 +30,7 @@ public class SoundPatch {
 
         var isHeadshot = hitbox.shapeId.part == HitboxColliders.Parts.Head;
 
-        if (damageType == DamageTypes.Critical || isHeadshot) {
+        if (source.damageType == DamageTypes.Critical || isHeadshot) {
             var soundPosition = Vector3.LerpUnclamped(player.transform.position, collisionPoint, data.indicatorDistanceHeadShoot);
             PluginInstance<HitSoundEffect>.Instance.PlayHitSound(soundPosition, true, volume: data.indicatorVolume);
         } else if (distance < 20) {

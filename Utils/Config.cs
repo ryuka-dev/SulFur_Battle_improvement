@@ -38,7 +38,9 @@ public class Config {
         EnableDamageMessage = cfg.Bind("Toggle/开关", "EnableDamageMessage", true, "Enable damage and kill message/是否开启伤害与击杀信息");
         EnableDeadUnitCollision = cfg.Bind("Toggle/开关", "EnableDeadUnitCollision", true, "Allowing bullets to pass through deadbody/是否使子弹能穿过尸体");
         EnableLoopDropVFX = cfg.Bind("Toggle/开关", "EnableLoopDropVFX", true, "Enable loot drop VFX/是否开启掉落特效");
-        EnableDeadProtection = cfg.Bind("Toggle/开关", "EnableDeadProtection", true, "Enable dead protection/是否开启死亡保护");
+        // Off by default since 0.18.5: the game now has a native insured-items system (church collection
+        // returns items on death), so this feature overlaps and can double-return weapons. Opt-in only.
+        EnableDeadProtection = cfg.Bind("Toggle/开关", "EnableDeadProtection", false, "Enable dead protection (overlaps with the game's native insured-items system since 0.18.5)/是否开启死亡保护（0.18.5 起与游戏原生保险箱重叠，默认关闭）");
     }
 
     private static void ExpShareConfigInit(ConfigFile cfg) {

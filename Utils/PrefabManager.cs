@@ -26,7 +26,10 @@ public static class PrefabManager {
             .GetManifestResourceStream("BattleImprove.Assets.battle_improve"));
 #endif
         if (AssetBundle == null) {
-            Plugin.LoggingInfo("Failed to load custom assets.");
+            // The bundle is built for a specific Unity version; a game engine upgrade makes it
+            // unloadable (LoadFromStream returns null). Feature code must degrade gracefully.
+            Plugin.LoggingInfo("Failed to load custom assets. VFX/hitmarker/kill-message/hit-sound " +
+                               "visuals are disabled until the asset bundle is rebuilt for the game's Unity version.");
         } else {
             var request = AssetBundle.LoadAssetAsync<GameObject>("AttackFeedback");
             yield return request;
@@ -50,21 +53,37 @@ public static class PrefabManager {
     }
     
     public static GameObject LoadPrefab(string name, GameObject parent) {
+        // The asset may be absent when the bundle failed to load (engine version mismatch) or when a
+        // specific asset is missing. Return null and let callers skip the visual instead of throwing.
+        if (!Prefabs.TryGetValue(name, out var prefab) || prefab == null) {
+            Plugin.LoggingInfo($"Prefab '{name}' is unavailable; skipping (asset bundle not loaded?).");
+            return null;
+        }
         Plugin.LoggingInfo($"Loading {name} Prefab...", true);
-        return Object.Instantiate(Prefabs[name], parent.transform, true);
+        return Object.Instantiate(prefab, parent.transform, true);
     }
-    
+
     internal static void LoadAttackFeedbackPrefab() {
         Plugin.IndicatorGameObject = LoadPrefab("AttackFeedback", Plugin.PluginGameObject);
+        if (Plugin.IndicatorGameObject == null) {
+            Plugin.LoggingInfo("AttackFeedback prefab unavailable; combat-feedback visuals disabled.");
+            return;
+        }
         TmpFontFixer.Apply(Plugin.IndicatorGameObject);
         LoadKillMessageStyle(DataManager.KillMessageStyle[DataManager.AttackFeedbackData.messageStyle]);
     }
 
     internal static void LoadKillMessageStyle(string style = "Battlefield 1") {
+        if (Plugin.IndicatorGameObject == null) {
+            return;
+        }
         if (PluginInstance<MessageController>.Instance != null) {
             Object.Destroy(PluginInstance<MessageController>.Instance.gameObject);
         }
         var styleObject = LoadPrefab(style, Plugin.IndicatorGameObject);
+        if (styleObject == null) {
+            return;
+        }
         TmpFontFixer.Apply(styleObject);
     }
 }

@@ -9,7 +9,7 @@ namespace BattleImprove.Patcher.TakeHitPatcher;
 
 [HarmonyWrapSafe]
 [HarmonyPatch(typeof(Npc), "ReceiveDamage",
-    new[] { typeof(float), typeof(DamageTypes), typeof(DamageSourceData), typeof(Hitmesh.Data), typeof(Vector3?) })]
+    new[] { typeof(float), typeof(DamageSourceData), typeof(Hitmesh.Data), typeof(Vector3?) })]
 public class CrossHairPatch : AttackFeedbackPatch {
     private static void Prefix(Npc __instance, out bool __state) {
         __state = __instance.UnitState is UnitState.Alive or UnitState.Incapacitated;

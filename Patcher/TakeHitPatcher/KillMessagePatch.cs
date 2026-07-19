@@ -11,7 +11,7 @@ namespace BattleImprove.Patcher.TakeHitPatcher;
 
 [HarmonyWrapSafe]
 [HarmonyPatch(typeof(Npc), "ReceiveDamage",
-    new[] { typeof(float), typeof(DamageTypes), typeof(DamageSourceData), typeof(Hitmesh.Data), typeof(Vector3?) })]
+    new[] { typeof(float), typeof(DamageSourceData), typeof(Hitmesh.Data), typeof(Vector3?) })]
 public class KillMessagePatch : AttackFeedbackPatch {
     private static void Postfix(Npc __instance, ref DamageSourceData source, Hitmesh.Data hitbox, Vector3? hitPosition) {
         if (PluginInstance<MessageController>.Instance == null) return;

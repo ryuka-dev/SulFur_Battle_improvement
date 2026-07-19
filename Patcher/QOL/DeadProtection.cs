@@ -57,7 +57,13 @@ public class DeadProtection {
             transform = __instance.transform;
         }
         
+        var helper = PluginInstance<LootSpawnHelper>.Instance;
+        if (helper == null) {
+            Plugin.LoggingInfo("LootSpawnHelper not initialized; cannot return saved equipment.");
+            return;
+        }
+
         var ItemData = DataManager.DeadProtectionData;
-        PluginInstance<LootSpawnHelper>.Instance.SpawnItems(ItemData, transform);
+        helper.SpawnItems(ItemData, transform);
     }
 }

@@ -39,6 +39,10 @@ public class LootDropPatch {
             ItemQuality.Legendary => PrefabManager.LoadPrefab("LoopDropTier5", __instance.gameObject),
             _ => PrefabManager.LoadPrefab("LoopDropTier1", __instance.gameObject)
         };
+        if (lootDropVFX == null) {
+            // Asset bundle unavailable — the loot-beam VFX cannot be spawned; nothing else to do.
+            return;
+        }
         var components = lootDropVFX.GetComponent<LootDropVFX>();
         components.SetParent(shadow);
     }

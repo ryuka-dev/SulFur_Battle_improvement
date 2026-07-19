@@ -52,7 +52,9 @@ public class Plugin : BaseUnityPlugin {
     }
 
     private IEnumerator InitPluginGameobject() {
-        while (!SulfurSave.Imp.initialized || !PrefabManager.IsLoaded) {
+        // 0.18.5: the save singleton (SulfurSave.Imp) was replaced by SulfurSaveState.active,
+        // which becomes non-null once a save slot has been launched into a run.
+        while (SulfurSaveState.active == null || !PrefabManager.IsLoaded) {
             LoggingInfo("Waiting for game to load...");
             yield return new WaitForSeconds(1f);
         }
