@@ -70,7 +70,11 @@ public static class PrefabManager {
             return;
         }
         TmpFontFixer.Apply(Plugin.IndicatorGameObject);
-        LoadKillMessageStyle(DataManager.KillMessageStyle[DataManager.AttackFeedbackData.messageStyle]);
+        // messageStyle comes from the player's save file, so it may name a style this build no longer has.
+        if (!DataManager.KillMessageStyle.TryGetValue(DataManager.AttackFeedbackData.messageStyle, out var style)) {
+            style = DataManager.KillMessageStyle[0];
+        }
+        LoadKillMessageStyle(style);
     }
 
     internal static void LoadKillMessageStyle(string style = "Battlefield 1") {

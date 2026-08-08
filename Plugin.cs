@@ -1,5 +1,6 @@
 ﻿#region
 
+using System;
 using System.Collections;
 using BattleImprove.Components;
 using BattleImprove.Components.QOL;
@@ -81,8 +82,14 @@ public class Plugin : BaseUnityPlugin {
         // load indicator prefab
         
         LoggingInfo("Loading plugin prefab...");
-        PrefabManager.LoadAttackFeedbackPrefab();
-        
+        // An exception here used to abort the whole coroutine, silently taking the F1 menu and the
+        // loot helper with it. The combat-feedback visuals are optional; the rest of the plugin is not.
+        try {
+            PrefabManager.LoadAttackFeedbackPrefab();
+        } catch (Exception e) {
+            LoggingInfo("Failed to load the combat-feedback prefab; its visuals are disabled: " + e);
+        }
+
         // load other gameobject
         LoggingInfo("Loading other gameobject...");
         PluginGameObject.AddComponent<LootSpawnHelper>();

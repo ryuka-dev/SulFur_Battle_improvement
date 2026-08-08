@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.4
+Fixed hit sounds, the hit marker and the kill message staying dead for players whose plugin save file had been damaged by an earlier release.
+
+A version of the mod that failed to start could write empty settings blocks into `BattleImproveSaveData` when you died or left to the menu. Those empty blocks were loaded back on every later launch, so 1.5.3 still had no settings to work with and threw on every hit. The file is now repaired automatically on startup, and settings are never written before they have been read.
+
+The F1 menu and the loot helper no longer disappear when the combat-feedback prefab fails to load.
+
 ## 1.5.3
 Compatibility fix for SULFUR 0.18.5.
 
