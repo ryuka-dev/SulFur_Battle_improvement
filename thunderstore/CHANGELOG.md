@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.5
+Fixed the kill banner losing its text partway through a session.
+
+The mod adopts the game's own font when it starts up, which happens while the main menu is still on screen. That font belongs to the menu, and the game frees it once you load into a level - after which the kill banner, the damage numbers and the damage counter were left with no font at all, drew nothing, and threw an error on every kill for the rest of the session. The font is now re-acquired whenever the one in use goes away.
+
+Enemy names in the kill banner now follow your game language instead of always being English. They also match how the game labels units elsewhere, so some lose the faction word they used to carry: "Goblin Spearman" is now just "Spearman". Names the game ships no translation for are unchanged.
+
 ## 1.5.4
 Fixed hit sounds, the hit marker and the kill message staying dead for players whose plugin save file had been damaged by an earlier release.
 
