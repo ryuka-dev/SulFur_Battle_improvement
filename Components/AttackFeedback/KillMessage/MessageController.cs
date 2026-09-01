@@ -92,10 +92,10 @@ public class MessageController : PluginInstance<MessageController> {
         }
 #if DEBUG
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            OnEnemyHit("Bullet Damage Type#" + Random.RandomRangeInt(0, 10), Random.RandomRangeInt(0, 100));
+            OnEnemyHit("Bullet Damage Type#" + Random.Range(0, 10), Random.Range(0, 100));
             OnEnemyKill("Enemy1", "Weapon1", "Exp1", false);
         } else if (Input.GetKeyDown(KeyCode.Alpha2)) {
-            OnEnemyHit("Bullet Damage Type#" + Random.RandomRangeInt(0, 10), Random.RandomRangeInt(0, 100));
+            OnEnemyHit("Bullet Damage Type#" + Random.Range(0, 10), Random.Range(0, 100));
             OnEnemyKill("Enemy2", "Weapon2", "Exp2", true);
         }
 #endif

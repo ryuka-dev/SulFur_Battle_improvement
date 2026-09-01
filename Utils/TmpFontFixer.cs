@@ -29,8 +29,16 @@ public static class TmpFontFixer {
     private const float ScanIntervalSeconds = 3f;
     private const float GiveUpAfterSeconds = 15f;
 
-    /// <summary>True once we've locked onto a CJK-capable game font and no longer need to retry.</summary>
-    public static bool Resolved { get; private set; }
+    private static bool _locked;
+
+    /// <summary>
+    /// True while we hold a font that is still alive. A locked font is not permanent: it belongs to the
+    /// scene it was found in, and the UnloadUnusedAssets that runs on a level transition destroys it.
+    /// Unity's null check sees that destroyed asset as null, which is what re-opens resolution — callers
+    /// gate <see cref="Apply"/> on this, so a font that dies with its scene gets replaced on the next kill
+    /// instead of leaving every text element with a null font for the rest of the session.
+    /// </summary>
+    public static bool Resolved => _locked && _gameFont != null;
 
     public static void Apply(GameObject root) {
         if (root == null) return;
@@ -49,11 +57,20 @@ public static class TmpFontFixer {
     }
 
     private static TMP_FontAsset ResolveGameFont() {
-        if (Resolved && _gameFont != null) return _gameFont;
+        if (_locked) {
+            if (_gameFont != null) return _gameFont;
+            // The locked font was destroyed along with the scene it came from; resolve again from scratch.
+            Plugin.LoggingInfo("TmpFontFixer: the locked game font was destroyed (level transition?); re-resolving.");
+            _locked = false;
+            _gameFont = null;
+            _giveUpTime = -1f;
+            _nextScanTime = 0f;
+        }
 
-        // Already have a (provisional) font and it isn't time to re-scan yet: reuse it. This keeps the
-        // expensive scans below off the kill/hit path when the CJK font never resolves (e.g. Latin locale).
-        if (_gameFont != null && Time.unscaledTime < _nextScanTime) return _gameFont;
+        // Not time to re-scan yet: reuse whatever we have (possibly nothing). This keeps the expensive
+        // scans below off the kill/hit path when the CJK font never resolves (e.g. Latin locale) and
+        // when nothing usable is loaded at all.
+        if (Time.unscaledTime < _nextScanTime) return _gameFont;
         _nextScanTime = Time.unscaledTime + ScanIntervalSeconds;
         if (_giveUpTime < 0f) _giveUpTime = Time.unscaledTime + GiveUpAfterSeconds;
 
@@ -75,22 +92,23 @@ public static class TmpFontFixer {
                 if (IsUsable(f)) { _gameFont = f; break; }
             }
             if (_gameFont == null) _gameFont = TMP_Settings.defaultFontAsset;
-            Plugin.LoggingInfo("TmpFontFixer: provisional font '" + Name(_gameFont) + "' (CJK not found yet, will retry).", true);
+            Plugin.LoggingInfo("TmpFontFixer: provisional font '" + Name(_gameFont) + "' (CJK not found yet, will retry).");
         }
 
         // Budget elapsed with no CJK font in sight: this is a non-CJK locale. Lock the provisional font
-        // permanently so the expensive scans above never run again (they were the per-kill stutter).
+        // so the expensive scans above stop running (they were the per-kill stutter); the lock still
+        // releases if that font is later destroyed with its scene.
         if (_gameFont != null && Time.unscaledTime >= _giveUpTime) {
-            Resolved = true;
-            Plugin.LoggingInfo("TmpFontFixer: no CJK font found within budget; locked '" + Name(_gameFont) + "'.", true);
+            _locked = true;
+            Plugin.LoggingInfo("TmpFontFixer: no CJK font found within budget; locked '" + Name(_gameFont) + "'.");
         }
         return _gameFont;
     }
 
     private static TMP_FontAsset Lock(TMP_FontAsset f) {
         _gameFont = f;
-        Resolved = true;
-        Plugin.LoggingInfo("TmpFontFixer: locked game font '" + Name(f) + "'.", true);
+        _locked = true;
+        Plugin.LoggingInfo("TmpFontFixer: locked game font '" + Name(f) + "'.");
         return f;
     }
 
