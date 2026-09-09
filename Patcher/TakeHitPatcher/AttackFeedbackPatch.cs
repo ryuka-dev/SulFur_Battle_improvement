@@ -28,4 +28,13 @@ public class AttackFeedbackPatch {
     protected static bool TargetCheck(DamageSourceData source) {
         return source.sourceUnit != null && source.sourceUnit.isPlayer;
     }
+
+    /// <summary>
+    /// Whether the unit was still standing when the hit landed. Bullets no longer stop on corpses but
+    /// still resolve against them (that is what makes organs drop), so feedback patches have to tell a
+    /// killing blow apart from a shot into a body that was already dead.
+    /// </summary>
+    internal static bool WasAliveBeforeHit(Npc npc) {
+        return npc.UnitState is UnitState.Alive or UnitState.Incapacitated;
+    }
 }

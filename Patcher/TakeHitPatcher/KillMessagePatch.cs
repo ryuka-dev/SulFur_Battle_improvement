@@ -13,9 +13,18 @@ namespace BattleImprove.Patcher.TakeHitPatcher;
 [HarmonyPatch(typeof(Npc), "ReceiveDamage",
     new[] { typeof(float), typeof(DamageSourceData), typeof(Hitmesh.Data), typeof(Vector3?) })]
 public class KillMessagePatch : AttackFeedbackPatch {
-    private static void Postfix(Npc __instance, ref DamageSourceData source, Hitmesh.Data hitbox, Vector3? hitPosition) {
+    private static void Prefix(Npc __instance, out bool __state) {
+        __state = WasAliveBeforeHit(__instance);
+    }
+
+    private static void Postfix(Npc __instance, ref DamageSourceData source, Hitmesh.Data hitbox, Vector3? hitPosition,
+        bool __state) {
         if (PluginInstance<MessageController>.Instance == null) return;
         if (!TargetCheck(source)) return;
+
+        // Only the hit that took the unit down announces a kill. Shooting a body something else
+        // killed is a corpse hit, not a kill of the player's, and must not claim one.
+        if (!__state) return;
 
         if (IsAlive(__instance)) return;
 

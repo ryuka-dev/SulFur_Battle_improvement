@@ -16,6 +16,7 @@ public class Config {
     internal static ConfigEntry<bool> EnableDamageMessage;
     internal static ConfigEntry<bool> EnableLoopDropVFX;
     internal static ConfigEntry<bool> EnableDeadProtection;
+    internal static ConfigEntry<bool> EnableDeadUnitFeedback;
     
     internal static ConfigEntry<bool> ReverseMouseScroll;
     
@@ -37,6 +38,9 @@ public class Config {
         EnableSoundFeedback = cfg.Bind("Toggle/开关", "EnableSoundFeedback", true, "Enable hit sound feedback on enemies/是否开启敌人受击声音反馈");
         EnableDamageMessage = cfg.Bind("Toggle/开关", "EnableDamageMessage", true, "Enable damage and kill message/是否开启伤害与击杀信息");
         EnableDeadUnitCollision = cfg.Bind("Toggle/开关", "EnableDeadUnitCollision", true, "Allowing bullets to pass through deadbody/是否使子弹能穿过尸体");
+        // Shooting a corpse is how organs are farmed, so those hits stay silent unless asked for:
+        // otherwise every corpse shot would fire the hit sound, the crosshair and a damage number.
+        EnableDeadUnitFeedback = cfg.Bind("Toggle/开关", "EnableDeadUnitFeedback", false, "Show combat feedback when hitting an already dead body/是否在击中尸体时显示战斗反馈");
         EnableLoopDropVFX = cfg.Bind("Toggle/开关", "EnableLoopDropVFX", true, "Enable loot drop VFX/是否开启掉落特效");
         // Off by default since 0.18.5: the game now has a native insured-items system (church collection
         // returns items on death), so this feature overlaps and can double-return weapons. Opt-in only.

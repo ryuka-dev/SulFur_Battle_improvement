@@ -12,25 +12,23 @@ namespace BattleImprove.Patcher.TakeHitPatcher;
     new[] { typeof(float), typeof(DamageSourceData), typeof(Hitmesh.Data), typeof(Vector3?) })]
 public class CrossHairPatch : AttackFeedbackPatch {
     private static void Prefix(Npc __instance, out bool __state) {
-        __state = __instance.UnitState is UnitState.Alive or UnitState.Incapacitated;
+        __state = WasAliveBeforeHit(__instance);
     }
 
     private static void Postfix(Npc __instance, ref DamageSourceData source, bool __state) {
         if (PluginInstance<xCrossHair>.Instance == null) return;
         if (!TargetCheck(source)) return;
-        // Only trigger on hits that landed on a living target this shot.
-        if (!__state) return;
+        // Hits on a body that was already dead only animate the crosshair when the player asked for it.
+        if (!__state && !Config.EnableDeadUnitFeedback.Value) return;
 
-        PlayHitAnimation(__instance);
+        PlayHitAnimation(__instance, __state);
     }
 
-    private static void PlayHitAnimation(Unit unit) {
-        var isAliveOrIncapacitated = unit.UnitState is UnitState.Alive or UnitState.Incapacitated;
+    private static void PlayHitAnimation(Unit unit, bool wasAliveBeforeHit) {
+        // Only the hit that actually took the unit down plays the kill animation; a hit on an
+        // already dead body is an ordinary hit.
+        var killedByThisHit = wasAliveBeforeHit && unit.UnitState is not (UnitState.Alive or UnitState.Incapacitated);
 
-        if (Config.EnableXCrossHair.Value && isAliveOrIncapacitated) {
-            PluginInstance<xCrossHair>.Instance.StartTrigger("Hit");
-        } else {
-            PluginInstance<xCrossHair>.Instance.StartTrigger("Kill");
-        }
+        PluginInstance<xCrossHair>.Instance.StartTrigger(killedByThisHit ? "Kill" : "Hit");
     }
 }

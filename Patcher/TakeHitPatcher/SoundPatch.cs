@@ -14,14 +14,21 @@ namespace BattleImprove.Patcher.TakeHitPatcher;
 public class SoundPatch {
     private static PluginData.AttackFeedback data;
 
-    private static void Postfix(Npc __instance, ref DamageSourceData source, Hitmesh.Data hitbox, Vector3? hitPosition) {
+    private static void Prefix(Npc __instance, out bool __state) {
+        __state = AttackFeedbackPatch.WasAliveBeforeHit(__instance);
+    }
+
+    private static void Postfix(Npc __instance, ref DamageSourceData source, Hitmesh.Data hitbox, Vector3? hitPosition,
+        bool __state) {
         if (PluginInstance<HitSoundEffect>.Instance == null) return;
         // Only play the hit sound for the player's own hits.
         if (source.sourceUnit == null || !source.sourceUnit.isPlayer) return;
 
         data ??= DataManager.AttackFeedbackData;
 
-        if (__instance.UnitState == UnitState.Dead) return;
+        // The killing blow stays silent, as it always has. A shot into a body that was already dead is
+        // the corpse hit organ farming relies on, and only plays when the player asked for it.
+        if (__instance.UnitState == UnitState.Dead && (__state || !Config.EnableDeadUnitFeedback.Value)) return;
         if (AttackFeedbackPatch.Enemies == null || !AttackFeedbackPatch.Enemies.Contains(__instance)) return;
 
         var player = StaticInstance<GameManager>.Instance.PlayerUnit;

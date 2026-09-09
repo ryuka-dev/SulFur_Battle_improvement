@@ -115,7 +115,7 @@ public class Plugin : BaseUnityPlugin {
         if (BattleImprove.Config.EnableExpShare.Value) Harmony.PatchAll(typeof(ExpSharePatch));
         if (BattleImprove.Config.EnableHealthBar.Value) Harmony.PatchAll(typeof(HealthBarPatch));
         if (BattleImprove.Config.EnableLoopDropVFX.Value) Harmony.PatchAll(typeof(LootDropPatch));
-        if (BattleImprove.Config.EnableDeadUnitCollision.Value) Harmony.PatchAll(typeof(RemoveDeadBodyCollisionTranspiler));
+        if (BattleImprove.Config.EnableDeadUnitCollision.Value) DeadBodyPassThrough.Apply(Harmony);
         if (BattleImprove.Config.EnableDeadProtection.Value) Harmony.PatchAll(typeof(DeadProtection));
 
         // Other
