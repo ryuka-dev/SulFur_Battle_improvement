@@ -1,6 +1,6 @@
 {
     "name": "BattleImprovements_fix",
-    "version_number": "1.5.5",
+    "version_number": "1.5.6",
     "website_url": "https://github.com/ryuka-dev/SulFur_Battle_improvement",
     "description": "Make the battle experience of Sulfur be better. Hit marker, Loot light beam, dead protection and more!",
     "dependencies": [

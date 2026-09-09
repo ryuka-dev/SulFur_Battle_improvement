@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.6
+Shooting a corpse drops organs again, and bullets still pass through it.
+
+Since 1.5.2 the bullets-through-corpses feature worked by taking a corpse's hit collider away, so corpses could not be shot at all - and shooting a corpse is how organs are harvested. Corpses are hit normally again; the bullet is simply not used up and carries on to whatever stands behind them.
+
+Hits on a body that was already dead no longer play the hit sound, the hit marker or a damage number. Set `EnableDeadUnitFeedback` in the config if you want that feedback while farming organs.
+
+The kill message is no longer shown for a body that something else killed.
+
 ## 1.5.5
 Fixed the kill banner losing its text partway through a session.
 
