@@ -11,6 +11,9 @@ public class LootDropPatch {
     [HarmonyWrapSafe]
     [HarmonyPostfix, HarmonyPatch(typeof(Pickup), "SetupAndSpawn")]
     private static void SetupAndSpawnPostfix(Pickup __instance) {
+        // Leaves the pickup exactly as the game spawned it, including its own VFX, when switched off.
+        if (!Config.EnableLoopDropVFX.Value) return;
+
         Plugin.LoggingInfo("LootParticle Postfix", true);
         Plugin.LoggingInfo("LootParticle Hide Postfix", true);
         var preVFX = __instance.GetComponentInChildren<LootDropVFX>();

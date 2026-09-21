@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections;
+using System.IO;
 using BattleImprove.Components;
 using BattleImprove.Components.QOL;
 using BattleImprove.Patcher.QOL;
@@ -42,6 +43,10 @@ public class Plugin : BaseUnityPlugin {
 #endif
         // Config
         BattleImprove.Config.InitConfig(Config);
+        // Localization. The strings are read from lang/<code>.json next to this assembly, and the
+        // language they are read for is the game's, which is not known yet this early - Update drives
+        // the first load once the game reports one.
+        i18n = new LocalizationManager(Path.GetDirectoryName(Info.Location));
         // Harmony patching
         Patching();
         // AssetBundle
@@ -60,11 +65,6 @@ public class Plugin : BaseUnityPlugin {
             yield return new WaitForSeconds(1f);
         }
         LoggingInfo("Starting plugin initialization...");
-        
-        // Localization
-        LoggingInfo("Loading localization...");
-        i18n = new LocalizationManager();
-        i18n.LoadLocalization(Application.systemLanguage);
         
         LoggingInfo("Initializing plugin gameobject...");
         // Plugin GameObject
@@ -101,7 +101,12 @@ public class Plugin : BaseUnityPlugin {
         menu.AddComponent<MenuController>();
     }
 
+    private void Update() {
+        i18n?.Tick();
+    }
+
     private void OnDestroy() {
+        i18n?.Dispose();
         Harmony.UnpatchSelf();
     }
     
@@ -112,9 +117,13 @@ public class Plugin : BaseUnityPlugin {
         Harmony.PatchAll(typeof(DataManager));
         
         // QOL
-        if (BattleImprove.Config.EnableExpShare.Value) Harmony.PatchAll(typeof(ExpSharePatch));
-        if (BattleImprove.Config.EnableHealthBar.Value) Harmony.PatchAll(typeof(HealthBarPatch));
-        if (BattleImprove.Config.EnableLoopDropVFX.Value) Harmony.PatchAll(typeof(LootDropPatch));
+        // These patches are installed unconditionally and read their toggle at the point where they
+        // act, so the in-game menu can switch the feature on and off without a restart. Only the
+        // toggles that decide whether IL is rewritten (the transpilers) or that own persisted state
+        // (dead protection) are still resolved once, here, and need a restart to change.
+        Harmony.PatchAll(typeof(ExpSharePatch));
+        Harmony.PatchAll(typeof(HealthBarPatch));
+        Harmony.PatchAll(typeof(LootDropPatch));
         if (BattleImprove.Config.EnableDeadUnitCollision.Value) DeadBodyPassThrough.Apply(Harmony);
         if (BattleImprove.Config.EnableDeadProtection.Value) Harmony.PatchAll(typeof(DeadProtection));
 
@@ -122,12 +131,10 @@ public class Plugin : BaseUnityPlugin {
         if (BattleImprove.Config.ReverseMouseScroll.Value) Harmony.PatchAll(typeof(MouseScrollTranspiler));
         
         // BF
-        if (BattleImprove.Config.EnableSoundFeedback.Value) Harmony.PatchAll(typeof(SoundPatch));
-        if (BattleImprove.Config.EnableDamageMessage.Value) {
-            Harmony.PatchAll(typeof(DamageInfoPatch));
-            Harmony.PatchAll(typeof(KillMessagePatch));
-        }
-        if (BattleImprove.Config.EnableXCrossHair.Value) Harmony.PatchAll(typeof(CrossHairPatch));
+        Harmony.PatchAll(typeof(SoundPatch));
+        Harmony.PatchAll(typeof(DamageInfoPatch));
+        Harmony.PatchAll(typeof(KillMessagePatch));
+        Harmony.PatchAll(typeof(CrossHairPatch));
         
         LoggingInfo("Patching complete!");
     }

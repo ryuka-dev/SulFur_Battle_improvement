@@ -20,6 +20,7 @@ public class SoundPatch {
 
     private static void Postfix(Npc __instance, ref DamageSourceData source, Hitmesh.Data hitbox, Vector3? hitPosition,
         bool __state) {
+        if (!Config.EnableSoundFeedback.Value) return;
         if (PluginInstance<HitSoundEffect>.Instance == null) return;
         // Only play the hit sound for the player's own hits.
         if (source.sourceUnit == null || !source.sourceUnit.isPlayer) return;

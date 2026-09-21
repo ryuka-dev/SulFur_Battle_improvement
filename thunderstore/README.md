@@ -7,7 +7,7 @@ Add some feature to improve the sulfur's battle experience
 This is a temporary maintenance fork. The original author has been contacted, and this fork provides interim maintenance to keep the mod working on the current SULFUR build. It is temporary by design: once the original author ships an official update, this fork will be retired in favor of it.
 
 ## Features
-All features can be turned off by cfg in BepInEx/Config folder
+Every feature can be switched on or off in the in-game menu (default key F1, under **Feature Toggles**), or in the cfg file in the BepInEx/config folder. Both edit the same settings, so a mod manager still works and nothing you already configured is overwritten. Combat feedback, the health bar, experience share and the loot beam apply immediately; the three entries marked with a star apply on the next launch.
 
 Battlefield 1/5 style kill message
 
@@ -32,6 +32,11 @@ Enables the health bar in the dev tools.
 Every time you gain some experience on current weapon, your second weapon will also gain some experience.
 
 Reverse mouse scroll.
+
+## Language
+The menu follows the language you picked in the game's own options and changes with it. All 14 languages the game ships are included. Translations other than English and Simplified Chinese are machine-assisted - corrections are welcome.
+
+Keep the ``lang`` folder next to the DLL when installing by hand; without it the menu simply falls back to English.
 
 ## Configurable
 - In Game config menu, default open key is F1

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
@@ -32,14 +32,16 @@
         <Reference Include="$(SulfurManaged)\PerfectRandom.Sulfur.Gameplay.dll" Private="false" />
         <Reference Include="$(SulfurManaged)\Sonity.Public.Runtime.dll" Private="false" />
         <Reference Include="$(SulfurManaged)\EasySave3.dll" Private="false" />
+        <!-- I2 Localization: the game's language setting is the plugin's language setting. -->
+        <Reference Include="$(SulfurManaged)\I2AsmDef.dll" Private="false" />
         <Reference Include="libs\UrGUI.dll" Private="true" />
     </ItemGroup>
 
-    <!-- Embedded resources (logical names must match the runtime lookups in PrefabManager / LocalizationManager). -->
+    <!-- Embedded resources (logical names must match the runtime lookups in PrefabManager).
+         Menu text is NOT embedded: it ships as thunderstore\lang\<code>.json next to the plugin, which is
+         where SULFUR's localization helper looks for it. -->
     <ItemGroup>
         <EmbeddedResource Include="Assets\battle_improve" LogicalName="BattleImprove.Assets.battle_improve" />
-        <EmbeddedResource Include="Lang\English.lang" LogicalName="BattleImprove.Lang.English.lang" />
-        <EmbeddedResource Include="Lang\ChineseSimplified.lang" LogicalName="BattleImprove.Lang.ChineseSimplified.lang" />
     </ItemGroup>
 
     <!-- Keep the decompiled game source and scratch out of the build. -->
@@ -53,6 +55,17 @@
     <Target Name="DeployToThunderstore" AfterTargets="Build" Condition="'$(DeployToSulfurProfile)' == 'true'">
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)\thunderstore" />
         <Copy SourceFiles="$(MSBuildProjectDirectory)\libs\UrGUI.dll" DestinationFolder="$(MSBuildProjectDirectory)\thunderstore" />
+    </Target>
+
+    <!-- The menu text is read from disk at runtime, so a local test install needs the lang folder beside
+         the plugin the same way the published package has it. Point SulfurPluginDir at the installed
+         plugin folder (e.g. a Gale profile) to get both copied there after a build. -->
+    <Target Name="DeployLangFiles" AfterTargets="Build" Condition="'$(SulfurPluginDir)' != ''">
+        <ItemGroup>
+            <LangFiles Include="$(MSBuildProjectDirectory)\thunderstore\lang\*.json" />
+        </ItemGroup>
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SulfurPluginDir)" />
+        <Copy SourceFiles="@(LangFiles)" DestinationFolder="$(SulfurPluginDir)\lang" />
     </Target>
 
 </Project>

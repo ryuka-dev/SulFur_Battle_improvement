@@ -19,6 +19,7 @@ public class KillMessagePatch : AttackFeedbackPatch {
 
     private static void Postfix(Npc __instance, ref DamageSourceData source, Hitmesh.Data hitbox, Vector3? hitPosition,
         bool __state) {
+        if (!Config.EnableDamageMessage.Value) return;
         if (PluginInstance<MessageController>.Instance == null) return;
         if (!TargetCheck(source)) return;
 

@@ -15,13 +15,13 @@ public class WindowUpdateCheck : WindowBase{
     }
     
     protected override void Init() {
-        window = UWindow.Begin("Update Check");
+        window = UWindow.Begin(Plugin.i18n.GetText("UpdateCheck.title", "Update Check"));
         StartPosition(0, 0);
 
         window.Space();
-        window.Label(Plugin.i18n.GetText("NeedUpdate"));
-        window.Label(Plugin.i18n.GetText("NeedUpdate.Current") + MyPluginInfo.PLUGIN_VERSION);
-        window.Label(Plugin.i18n.GetText("NeedUpdate.Text"));
+        window.Label(Plugin.i18n.GetText("NeedUpdate", "Battle Improvement have new version!"));
+        window.Label(Plugin.i18n.GetText("NeedUpdate.Current", "Current Version:") + MyPluginInfo.PLUGIN_VERSION);
+        window.Label(Plugin.i18n.GetText("NeedUpdate.Text", "Please update to the latest version!"));
         
         base.Init();
         window.IsDrawing = true;

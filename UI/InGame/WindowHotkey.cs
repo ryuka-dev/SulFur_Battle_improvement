@@ -13,9 +13,9 @@ public class WindowHotkey : WindowBase {
     private KeyCode key;
     
     protected override void Init() {
-        window = UWindow.Begin(i18n.GetText("Hotkey.title"));
+        window = UWindow.Begin(i18n.GetText("Hotkey.title", "Press a key"));
         var data = DataManager.VersionData;
-        label = window.Label(i18n.GetText("Hotkey.current") + " " + data.menuKey.ToString());
+        label = window.Label(i18n.GetText("Hotkey.current", "Current Hotkey") + " " + data.menuKey.ToString());
         StartPosition(350, 350);
         
         base.Init();
@@ -33,7 +33,7 @@ public class WindowHotkey : WindowBase {
                 key = e.keyCode;
                 var info = typeof(UWindowControls.WLabel).GetField("DisplayedString", BindingFlags.NonPublic | BindingFlags.Instance);
                 if (info != null) {
-                    info.SetValue(label,i18n.GetText("Hotkey.current") + " " + key.ToString());
+                    info.SetValue(label,i18n.GetText("Hotkey.current", "Current Hotkey") + " " + key.ToString());
                 }
             }
         }

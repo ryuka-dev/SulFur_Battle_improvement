@@ -14,16 +14,16 @@ public class WindowDeadProtection : WindowBase{
     protected override void Init() {
         data = DataManager.DeadProtectionData;
         
-        window = UWindow.Begin("Dead Protection");
+        window = UWindow.Begin(i18n.GetText("DeadProtection", "Death Protection"));
         window.Width += 50;
         StartPosition(310, 100);
-        window.Label(i18n.GetText("DeadProtection.durability"));
+        window.Label(i18n.GetText("DeadProtection.durability", "Weapon Durability Loss (%)"));
         window.Slider("", OnDurabilityChange, data.weaponDurability, 0, 1, true);
-        window.Label(i18n.GetText("DeadProtection.barrel"));
+        window.Label(i18n.GetText("DeadProtection.barrel", "Barrel Loss Probability (%)"));
         window.Slider("", OnBarrelChange, data.barrelChance, 0, 1, true);
-        window.Label(i18n.GetText("DeadProtection.attachment"));
+        window.Label(i18n.GetText("DeadProtection.attachment", "Attachment Loss Probability (%)"));
         window.Slider("", OnAttachmentChange, data.attachmentChance, 0, 1, true);
-        window.Label(i18n.GetText("DeadProtection.enchantment"));
+        window.Label(i18n.GetText("DeadProtection.enchantment", "Enchantment Loss Probability (%)"));
         window.Slider("", OnEnchantmentChange, data.enchantmentChance, 0, 1, true);
         
         base.Init();

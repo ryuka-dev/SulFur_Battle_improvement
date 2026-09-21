@@ -16,6 +16,7 @@ public class CrossHairPatch : AttackFeedbackPatch {
     }
 
     private static void Postfix(Npc __instance, ref DamageSourceData source, bool __state) {
+        if (!Config.EnableXCrossHair.Value) return;
         if (PluginInstance<xCrossHair>.Instance == null) return;
         if (!TargetCheck(source)) return;
         // Hits on a body that was already dead only animate the crosshair when the player asked for it.

@@ -37,7 +37,7 @@ public class WindowBase : MonoBehaviour {
 
     protected virtual void Init() {
         window.Space();
-        window.Button("Close", Close);
+        window.Button(i18n.GetText("Close", "Close"), Close);
         window.IsDrawing = false;
     }
 

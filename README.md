@@ -7,7 +7,7 @@ Add some feature to improve the sulfur's battle experience
 This is a temporary maintenance fork. The original author has been contacted, and this fork provides interim maintenance to keep the mod working on the current SULFUR build. It is temporary by design: once the original author ships an official update, this fork will be retired in favor of it.
 
 ## Features
-All features can be turned off by cfg in BepInEx/Config folder
+All features can be turned off in the in-game menu (default key F1) or by cfg in BepInEx/Config folder
 
 Battlefield 1/5 style kill message
 
@@ -34,11 +34,23 @@ Every time you gain some experience on current weapon, your second weapon will a
 
 ## Configurable
 - In Game config menu, default open key is F1
+- Feature toggles, under `Feature Toggles` in that menu: every feature can be switched on or off
+  without leaving the game. The menu edits the same `BepInEx/config` file a mod manager or an
+  external config UI would, so existing settings are read, not replaced. Combat feedback, the health
+  bar, experience share and the loot VFX apply immediately; the three entries marked `*` are applied
+  on the next launch.
 - Volume and distance of the hit sound.
 - Color of the hitmarker.
 - Volume of the kill message.
 - How many weapon durability you will lose when you get your weapon back.
 - The chance of the attachment and enhancement will be lost when you get your weapon back.
+
+## Localization
+Menu text lives in `thunderstore/lang/<code>.json`, one file per language the game ships (`en sv fr it de es pt ru pl ja ko zh-CN tr ar`). The files are published next to the DLL, which is where SULFUR's localization helper looks for them, so the same files also localize the config page for players who have an external config UI installed - the plugin itself does not depend on one.
+
+`en.json` is the base and must stay complete; every other language is overlaid on top of it key by key, so an untranslated term shows English rather than an empty line. Each lookup in the code also passes the English text as a fallback, verbatim as it appears in `en.json`, so a package installed without the lang folder degrades to English instead of raw keys.
+
+Build with `-p:SulfurPluginDir=<installed plugin folder>` to copy the DLL and the lang files into a local test install.
 
 ## Game Compatibility
 **Only Latest version of Sulfur is supported.**

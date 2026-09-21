@@ -9,11 +9,11 @@ namespace BattleImprove.UI.InGame;
 
 public class WindowSetting : WindowBase {
     protected override void Init() {
-        window = UWindow.Begin(i18n.GetText("Settings"));
+        window = UWindow.Begin(i18n.GetText("Settings", "Settings"));
         window.Width += 50;
         StartPosition(310, 100);
-        window.Button(i18n.GetText("Reset"), (Reset));
-        window.Button(i18n.GetText("Hotkey"), (ChangeMenuKey));
+        window.Button(i18n.GetText("Reset", "Reset"), (Reset));
+        window.Button(i18n.GetText("Hotkey", "Menu Hotkey"), (ChangeMenuKey));
         
         base.Init();
     }
