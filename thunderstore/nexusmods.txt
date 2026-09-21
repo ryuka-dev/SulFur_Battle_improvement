@@ -7,7 +7,7 @@ Add some feature to improve the sulfur's battle experience
 This is a temporary maintenance fork. The original author has been contacted, and this fork provides interim maintenance to keep the mod working on the current SULFUR build. It is temporary by design: once the original author ships an official update, this fork will be retired in favor of it.
 
 [color=RoyalBlue][b]Features[/b][/color]
-All features can be turned off by cfg in BepInEx/Config folder
+Every feature can be switched on or off in the in-game menu (default key F1, under [b]Feature Toggles[/b]), or in the cfg file in the BepInEx/config folder. Both edit the same settings, so a mod manager still works and nothing you already configured is overwritten. Combat feedback, the health bar, experience share and the loot beam apply immediately; the three entries marked with a star apply on the next launch.
 
 Battlefield 1/5 style kill message
 
@@ -32,6 +32,11 @@ Enables the health bar in the dev tools.
 Every time you gain some experience on current weapon, your second weapon will also gain some experience.
 
 Reverse mouse scroll.
+
+[color=RoyalBlue][b]Language[/b][/color]
+The menu follows the language you picked in the game's own options and changes with it. All 14 languages the game ships are included. Translations other than English and Simplified Chinese are machine-assisted - corrections are welcome.
+
+Keep the `[color=#ffff00]lang[/color]` folder next to the DLL when installing by hand; without it the menu simply falls back to English.
 
 [color=RoyalBlue][b]Configurable[/b][/color]
 [list]
@@ -69,6 +74,15 @@ Audio/Texture: Electronic Arts, DICE
 UI library: Hirashi3630/UrGUI
 
 [font=Arial Black][color=DarkOrange][size=5][b]Changelog[/b][/size][/color][/font]
+
+[color=RoyalBlue][b]1.5.7[/b][/color]
+Every feature can now be switched on or off from the in-game menu (F1), under [b]Feature Toggles[/b].
+
+The menu edits the same settings as the cfg file in BepInEx/config, so a mod manager or an external config UI still works and nothing you had already configured is overwritten. Combat feedback, the enemy health bar, experience share and the loot beam take effect the moment you flip them; bullets through corpses, reversed mouse scroll and death protection are applied on the next launch and are marked with a star.
+
+The menu now follows the language you picked in the game's own options, and changes with it. It used to follow the operating system instead, and was read only once at startup.
+
+All 14 languages the game ships are included. Translations other than English and Simplified Chinese are machine-assisted - corrections are welcome. The text lives in a [color=#ffff00]lang[/color] folder next to the DLL; if it is missing, the menu falls back to English.
 
 [color=RoyalBlue][b]1.5.6[/b][/color]
 Shooting a corpse drops organs again, and bullets still pass through it.

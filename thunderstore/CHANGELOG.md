@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.7
+Every feature can now be switched on or off from the in-game menu (F1), under **Feature Toggles**.
+
+The menu edits the same settings as the cfg file in BepInEx/config, so a mod manager or an external config UI still works and nothing you had already configured is overwritten. Combat feedback, the enemy health bar, experience share and the loot beam take effect the moment you flip them; bullets through corpses, reversed mouse scroll and death protection are applied on the next launch and are marked with a star.
+
+The menu now follows the language you picked in the game's own options, and changes with it. It used to follow the operating system instead, and was read only once at startup.
+
+All 14 languages the game ships are included. Translations other than English and Simplified Chinese are machine-assisted - corrections are welcome. The text lives in a `lang` folder next to the DLL; if it is missing, the menu falls back to English.
+
 ## 1.5.6
 Shooting a corpse drops organs again, and bullets still pass through it.
 
