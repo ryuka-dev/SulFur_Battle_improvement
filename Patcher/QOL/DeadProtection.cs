@@ -17,7 +17,15 @@ namespace BattleImprove.Patcher.QOL;
 public class DeadProtection {
     [HarmonyWrapSafe]
     [HarmonyPrefix, HarmonyPatch(typeof(LootManager), "AddToChurchCollection")]
-    private static void SavePlayerEquipment() {
+    private static void SavePlayerEquipment(SulfurSave.Difficulty difficulty) {
+        // Since 0.19.9 the game calls AddToChurchCollection on Easy, Medium and Hard.
+        // Only Hard clears the paperdoll; on Easy and Medium the equipped weapons are
+        // never lost, so saving them there would only duplicate them in the donation box.
+        if (difficulty != SulfurSave.Difficulty.Hard) {
+            Plugin.LoggingInfo("Death protection skipped: difficulty " + difficulty + " keeps equipped weapons");
+            return;
+        }
+
         Plugin.LoggingInfo("Player died, saving weapon! Quick!!!");
         var itemData = DataManager.DeadProtectionData;
         var weapons = itemData.weapons;

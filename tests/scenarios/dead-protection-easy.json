@@ -1,0 +1,29 @@
+{
+  "name": "dead-protection-easy",
+  "mod": "BattleImprove",
+  "description": "Death protection on Easy: die once in Act_01_Sewers (seed 12345, teleported into the Black Guild group near the start), then open the hub Collection Box. Expected: nothing is stored and nothing is returned, because Easy keeps the equipped weapons. Before running, write the fixture for slot 4 with: python -I tests/scenarios/make_difficulty_slot.py <a hub slot .sss> %LOCALAPPDATA%/mcp-sulfur/fixtures/BattleImprove/host/Sulfur_SaveSlot_4.sss Easy --force . Weapon counts have no log line; check them interactively (inventory before/after, interact list near the box).",
+  "setup": { "slot": 4, "resetSlot": true, "chapter": "Act_01_Sewers", "seed": 12345, "godMode": false, "instances": ["host"] },
+  "requires": {
+    "config": [
+      { "instance": "host", "file": "BepInEx/config/BattleImprove.cfg", "section": "Toggle/开关", "key": "EnableDeadProtection", "value": "true",
+        "why": "the death-protection patches are only applied when this is on at startup" }
+    ]
+  },
+  "steps": [
+    { "label": "walk into the Black Guild group", "do": "call", "instance": "host", "method": "teleport", "args": { "position": [40, -4.5, 41] } },
+    { "label": "die and return to the hub", "do": "wait", "seconds": 20 },
+    { "label": "dismiss press-to-continue", "do": "call", "instance": "host", "method": "input", "args": { "actions": [ { "key": "Space", "op": "press" }, { "waitMs": 3000 } ], "allowBackground": true } },
+    { "label": "go to the Collection Box", "do": "call", "instance": "host", "method": "teleport", "args": { "position": [-19.5, 8.6, -26.5] } },
+    { "do": "wait", "seconds": 1 },
+    { "label": "open the Collection Box", "do": "call", "instance": "host", "method": "interact", "args": { "action": "use", "target": "Collection Box" } },
+    { "do": "wait", "seconds": 5 },
+    { "do": "screenshot", "instance": "host" }
+  ],
+  "assertions": [
+    { "name": "died on Easy", "instance": "host", "scope": "steps", "pattern": "Handling Death Consequences\\.\\.\\. difficulty=Easy", "op": "==", "value": 1 },
+    { "name": "protection skipped", "instance": "host", "scope": "steps", "pattern": "Death protection skipped: difficulty Easy", "op": "==", "value": 1 },
+    { "name": "no weapon stored", "instance": "host", "scope": "steps", "pattern": "Player died, saving weapon|Saved item: ", "op": "==", "value": 0 },
+    { "name": "box opened", "instance": "host", "scope": "steps", "pattern": "Donation box opened", "op": "==", "value": 1 },
+    { "name": "no exceptions", "instance": "host", "scope": "steps", "pattern": "Exception", "op": "==", "value": 0 }
+  ]
+}
