@@ -20,8 +20,14 @@ public class LootSpawnHelper : PluginInstance<LootSpawnHelper> {
     }
 
     public void SpawnItems(PluginData.DeadProtection keptItems, Transform transform) {
-        this.StartCoroutine(SpawnWeapon(keptItems.weapons, transform));
+        // Persist the "already returned" state as soon as the box is opened. The plugin does not
+        // save on quit, so a flag set only in memory left the file holding the weapons with
+        // opened=false after the game was closed, and the next session returned them again.
+        // Saving with opened=true clears keptItems.weapons, so the coroutine iterates a copy.
+        var weapons = new List<InventoryData>(keptItems.weapons);
         keptItems.opened = true;
+        DataManager.SaveDeadProtectionData();
+        this.StartCoroutine(SpawnWeapon(weapons, transform));
     }
 
     private IEnumerator SpawnWeapon(List<InventoryData> weapons, Transform transform) {
