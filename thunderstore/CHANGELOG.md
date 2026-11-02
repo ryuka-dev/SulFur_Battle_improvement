@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.8
+Fixed death protection duplicating weapons.
+
+Since the game's 0.19.9 update, dying on Easy or Medium goes through the same step that used to run only on Hard. Death protection saved your equipped weapons there as well, even though Easy and Medium never take them from you, so the donation box handed out a second copy. Death protection now acts only on Hard again, as it did before that update.
+
+Fixed the donation box returning the same weapons twice. Opening it only marked the weapons as returned until the game was closed: if you quit without dying again or leaving through the pause menu, the next session - in any save slot - gave them back once more. The box now records this the moment it opens.
+
+If your box still holds weapons from before this update, you get them one last time.
+
 ## 1.5.7
 Every feature can now be switched on or off from the in-game menu (F1), under **Feature Toggles**.
 

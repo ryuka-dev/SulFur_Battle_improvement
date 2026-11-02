@@ -17,7 +17,7 @@ Loot drop effect, never miss your loot again.
 
 [img]https://github.com/CmmmmmmLau/SulFur_Battle_improvement/blob/master/docs/lootdrop_vfx.gif?raw=true[/img]
 
-You can get your weapons back from the donation box.
+Die on Hard and you can get your weapons back from the donation box.
 
 Of course... you have to lose something...
 
@@ -74,6 +74,15 @@ Audio/Texture: Electronic Arts, DICE
 UI library: Hirashi3630/UrGUI
 
 [font=Arial Black][color=DarkOrange][size=5][b]Changelog[/b][/size][/color][/font]
+
+[color=RoyalBlue][b]1.5.8[/b][/color]
+Fixed death protection duplicating weapons.
+
+Since the game's 0.19.9 update, dying on Easy or Medium goes through the same step that used to run only on Hard. Death protection saved your equipped weapons there as well, even though Easy and Medium never take them from you, so the donation box handed out a second copy. Death protection now acts only on Hard again, as it did before that update.
+
+Fixed the donation box returning the same weapons twice. Opening it only marked the weapons as returned until the game was closed: if you quit without dying again or leaving through the pause menu, the next session - in any save slot - gave them back once more. The box now records this the moment it opens.
+
+If your box still holds weapons from before this update, you get them one last time.
 
 [color=RoyalBlue][b]1.5.7[/b][/color]
 Every feature can now be switched on or off from the in-game menu (F1), under [b]Feature Toggles[/b].

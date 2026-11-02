@@ -17,7 +17,7 @@ Loot drop effect, never miss your loot again.
 
 ![lootvfx](https://github.com/CmmmmmmLau/SulFur_Battle_improvement/blob/master/docs/lootdrop_vfx.gif?raw=true)
 
-You can get your weapons back from the donation box.
+Die on Hard and you can get your weapons back from the donation box.
 
 Of course... you have to lose something...
 
