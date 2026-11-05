@@ -22,6 +22,10 @@ public class ExpSharePatch {
         var proportion = Config.Proportion.Value;
 
         if (!equippedWeapon.ContainsKey(secondWeapon)) return;
+
+        // The game leaves max rank weapons out of the XP distribution; the share has to as well.
+        if (equippedWeapon[secondWeapon].IsMaxRank) return;
+
         equippedWeapon[secondWeapon].AddExperience(exp * proportion);
     }
 }

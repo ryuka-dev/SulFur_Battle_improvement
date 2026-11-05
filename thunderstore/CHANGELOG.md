@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+Experience share no longer gives XP to a max rank weapon. The game has left those weapons out of the XP distribution since 1.0; this also respects the rank cap of Enchantments Unbound.
+
 ## 1.5.8
 Fixed death protection duplicating weapons.
 
