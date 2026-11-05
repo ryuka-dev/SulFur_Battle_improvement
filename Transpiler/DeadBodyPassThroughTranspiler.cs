@@ -45,6 +45,9 @@ namespace BattleImprove.Transpiler;
 // same corpse either -- ProjectileRay.hitInstIDs already records every collider a projectile has
 // hit, and a repeat is rejected before it can consume another hit slot.
 //
+// The stop rule runs after the damage, so by then the unit a shot has just killed is dead as well.
+// CorpseHitTracker reads the unit before the hit: the killing shot stops, as it does in the game.
+//
 // If the IL pattern ever stops matching (a game update rewriting that test), we fall back to the
 // old collider-disabling behaviour so the advertised feature degrades instead of disappearing.
 public static class DeadBodyPassThrough {
@@ -52,6 +55,7 @@ public static class DeadBodyPassThrough {
 
     public static void Apply(Harmony harmony) {
         try {
+            harmony.PatchAll(typeof(CorpseHitTracker));
             harmony.PatchAll(typeof(ProjectileStopTranspiler));
         } catch (Exception e) {
             ProjectileStopPatched = false;
@@ -62,7 +66,11 @@ public static class DeadBodyPassThrough {
 
         Plugin.Logger.LogWarning(
             "Bullets-through-corpses falls back to disabling corpse hit colliders; corpses cannot be shot for organs.");
-        harmony.PatchAll(typeof(CorpseColliderFallback));
+        try {
+            harmony.PatchAll(typeof(CorpseColliderFallback));
+        } catch (Exception e) {
+            Plugin.Logger.LogError("Could not apply the corpse collider fallback: " + e);
+        }
     }
 }
 
@@ -145,9 +153,27 @@ internal static class ProjectileStopTranspiler {
     /// </summary>
     private static void StopUnlessCorpse(ref NativeList<ProjectileSystem.ID> stopList,
         ref ProjectileSystem.ID projectile, Unit unit) {
-        if (!unit.IsAlive) return;
+        if (CorpseHitTracker.LastHitWasCorpse) return;
 
         stopList.Add(in projectile);
+    }
+}
+
+/// <summary>
+/// Remembers whether the unit <c>ProcessUnitHit</c> just processed was already dead when the hit
+/// landed. ProjectileSystem.FixedUpdate reads it straight after that call, on the same thread. The
+/// value is set in the postfix so that the outermost call wins if the hit causes further hits.
+/// </summary>
+[HarmonyPatch(typeof(ProjectileUtilities), "ProcessUnitHit")]
+internal static class CorpseHitTracker {
+    internal static bool LastHitWasCorpse;
+
+    private static void Prefix(Unit target, out bool __state) {
+        __state = !target.IsAlive;
+    }
+
+    private static void Postfix(bool __state) {
+        LastHitWasCorpse = __state;
     }
 }
 
