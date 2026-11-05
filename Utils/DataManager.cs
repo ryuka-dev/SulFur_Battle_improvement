@@ -54,12 +54,12 @@ public static class DataManager {
         SaveDeadProtectionData();
     }
 
-    public static void SaveVersionData(bool reset = false) {
+    public static void SaveVersionData() {
         if (!Initialized) return;
         SaveManager.SaveVersionData();
     }
 
-    public static void SaveAttackMessageData(bool reset = false) {
+    public static void SaveAttackMessageData() {
         if (!Initialized) return;
         SaveManager.SaveAttackMessageData();
     }
@@ -74,6 +74,7 @@ public static class DataManager {
         SaveManager.SaveDeadProtectionData();
     }
     
+    [HarmonyWrapSafe]
     [HarmonyPostfix]
     [HarmonyPatch(typeof(PauseMenu), "ExitAction")]
     [HarmonyPatch(typeof(GameManager), "PlayerDied")]

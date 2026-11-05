@@ -30,9 +30,31 @@ public static class SaveManager {
     }
 
     private static void LoadAll() {
-        LoadVersionData();
-        LoadAttackMessageData();
-        LoadDeadProtectionData();
+        // In this order so the weapons waiting in the donation box, the data that is hardest to
+        // replace, are the only thing a failure can leave unread on its own.
+        try {
+            LoadVersionData();
+            LoadAttackMessageData();
+            LoadDeadProtectionData();
+        } catch (Exception e) {
+            Plugin.Logger.LogWarning($"The save file could not be read: {e.Message}");
+            ReplaceUnreadableFile();
+        }
+    }
+
+    // Stop at the first failure: ES3 may never return from reading on through a damaged file, and it
+    // cannot save into a file it cannot parse either. What was read stays, the rest is on defaults,
+    // and the whole file is rewritten from that. The original is copied first and kept if it can't be.
+    private static void ReplaceUnreadableFile() {
+        var backup = $"{SaveFileName}.{DateTime.Now:yyyyMMdd-HHmmss}.bak";
+        try {
+            ES3.CopyFile(SaveFileName, backup);
+            Plugin.Logger.LogWarning($"Kept a copy of it as {backup}; unread settings are back to their defaults.");
+            ES3.DeleteFile(SaveFileName);
+            SaveAll();
+        } catch (Exception e) {
+            Plugin.Logger.LogWarning($"Could not replace the save file; running on defaults: {e.Message}");
+        }
     }
 
     // ES3 only substitutes the supplied default when the key is *absent*. A key that was written as
@@ -43,7 +65,7 @@ public static class SaveManager {
         var data = ES3.Load("DeadProtection", SaveFileName, new PluginData.DeadProtection());
         var repaired = data == null;
         DataManager.DeadProtectionData = data;
-        if (repaired) RepairKey("DeadProtection", () => SaveDeadProtectionData());
+        if (repaired) RepairKey("DeadProtection", SaveDeadProtectionData);
     }
 
     private static void LoadAttackMessageData() {
@@ -74,12 +96,12 @@ public static class SaveManager {
     }
     
     
-    public static void SaveAll() {
+    private static void SaveAll() {
         SaveVersionData();
         SaveAttackMessageData();
         SaveDeadProtectionData();
     }
-    
+
     public static void SaveVersionData() {
         ES3.Save("Version", DataManager.VersionData, SaveManager.SaveFileName);
     }
@@ -88,7 +110,7 @@ public static class SaveManager {
         ES3.Save("AttackFeedback", DataManager.AttackFeedbackData, SaveManager.SaveFileName);
     }
     
-    public static void SaveDeadProtectionData(bool reset = false) {
+    public static void SaveDeadProtectionData() {
         ES3.Save("DeadProtection", DataManager.DeadProtectionData, SaveManager.SaveFileName);
     }
 
