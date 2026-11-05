@@ -47,6 +47,7 @@ public class Plugin : BaseUnityPlugin {
         // the first load once the game reports one.
         i18n = new LocalizationManager(Path.GetDirectoryName(Info.Location));
         // Harmony patching
+        Harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
         Patching();
         // AssetBundle
         StartCoroutine(PrefabManager.LoadAssetBundle());
@@ -60,7 +61,7 @@ public class Plugin : BaseUnityPlugin {
         // 0.18.5: the save singleton (SulfurSave.Imp) was replaced by SulfurSaveState.active,
         // which becomes non-null once a save slot has been launched into a run.
         while (SulfurSaveState.active == null || !PrefabManager.IsLoaded) {
-            LoggingInfo("Waiting for game to load...");
+            LoggingInfo("Waiting for game to load...", true);
             yield return new WaitForSeconds(1f);
         }
         LoggingInfo("Starting plugin initialization...");
@@ -112,30 +113,40 @@ public class Plugin : BaseUnityPlugin {
 
     private void Patching() {
         LoggingInfo("Patching...", true);
-        Harmony = Harmony.CreateAndPatchAll(typeof(AttackFeedbackPatch));
-        Harmony.PatchAll(typeof(DataManager));
+        TryPatch(typeof(AttackFeedbackPatch));
+        TryPatch(typeof(DataManager));
         
         // QOL
         // These patches are installed unconditionally and read their toggle at the point where they
         // act, so the in-game menu can switch the feature on and off without a restart. Only the
         // toggles that decide whether IL is rewritten (the transpilers) or that own persisted state
         // (dead protection) are still resolved once, here, and need a restart to change.
-        Harmony.PatchAll(typeof(ExpSharePatch));
-        Harmony.PatchAll(typeof(HealthBarPatch));
-        Harmony.PatchAll(typeof(LootDropPatch));
+        TryPatch(typeof(ExpSharePatch));
+        TryPatch(typeof(HealthBarPatch));
+        TryPatch(typeof(LootDropPatch));
         if (BattleImprove.Config.EnableDeadUnitCollision.Value) DeadBodyPassThrough.Apply(Harmony);
-        if (BattleImprove.Config.EnableDeadProtection.Value) Harmony.PatchAll(typeof(DeadProtection));
+        if (BattleImprove.Config.EnableDeadProtection.Value) TryPatch(typeof(DeadProtection));
 
         // Other
-        if (BattleImprove.Config.ReverseMouseScroll.Value) Harmony.PatchAll(typeof(MouseScrollTranspiler));
+        if (BattleImprove.Config.ReverseMouseScroll.Value) TryPatch(typeof(MouseScrollTranspiler));
         
         // BF
-        Harmony.PatchAll(typeof(SoundPatch));
-        Harmony.PatchAll(typeof(DamageInfoPatch));
-        Harmony.PatchAll(typeof(KillMessagePatch));
-        Harmony.PatchAll(typeof(CrossHairPatch));
-        
+        TryPatch(typeof(SoundPatch));
+        TryPatch(typeof(DamageInfoPatch));
+        TryPatch(typeof(KillMessagePatch));
+        TryPatch(typeof(CrossHairPatch));
+
         LoggingInfo("Patching complete!");
+    }
+
+    // A game update that moves one patch target costs that one feature. Letting the exception out of
+    // Awake would stop the bundle and the menu from loading as well.
+    private static void TryPatch(Type patch) {
+        try {
+            Harmony.PatchAll(patch);
+        } catch (Exception e) {
+            Logger.LogError($"Could not apply {patch.Name}; that feature may not work: {e}");
+        }
     }
     
     public static void LoggingInfo(string info, bool needDebug = false) {

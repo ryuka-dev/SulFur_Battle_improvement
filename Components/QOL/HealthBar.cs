@@ -67,7 +67,7 @@ public class HealthBar : MonoBehaviour {
                    Vector3.Distance(position, camera.transform.position) < 15;
         }
         catch {
-            Plugin.Logger.LogInfo("Player camera lost, trying to find it again");
+            Plugin.LoggingInfo("Player camera lost, trying to find it again", true);
             camera = StaticInstance<GameManager>.Instance.currentCamera;
             StaticInstance<DevToolsManager>.Instance.AddDebugFrameToUnit(npc);
         }

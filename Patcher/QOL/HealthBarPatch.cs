@@ -1,4 +1,5 @@
-﻿using BattleImprove.Components;
+﻿using System;
+using BattleImprove.Components;
 using BattleImprove.Components.QOL;
 using HarmonyLib;
 using PerfectRandom.Sulfur.Core;
@@ -8,6 +9,8 @@ using PerfectRandom.Sulfur.Core.Units;
 namespace BattleImprove.Patcher.QOL;
 
 public class HealthBarPatch {
+    private static Action<UnitDebugFrame> updateValues;
+
     [HarmonyWrapSafe]
     [HarmonyPrefix, HarmonyPatch(typeof(UnitDebugFrame), "Update")]
     private static bool UpdateHPBar(UnitDebugFrame __instance) {
@@ -21,7 +24,11 @@ public class HealthBarPatch {
         // bar removed itself) keep the game's own frame behaviour.
         var bar = __instance.owner.GetComponent<HealthBar>();
         if (bar == null) return true;
-        if (bar.UpdateValue()) Traverse.Create(__instance).Method("UpdateValues").GetValue();
+        if (bar.UpdateValue()) {
+            updateValues ??= AccessTools.MethodDelegate<Action<UnitDebugFrame>>(
+                AccessTools.Method(typeof(UnitDebugFrame), "UpdateValues"));
+            updateValues(__instance);
+        }
 
         if (__instance.owner.IsAlive) return false;
 
