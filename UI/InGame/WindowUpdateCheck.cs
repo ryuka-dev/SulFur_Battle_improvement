@@ -6,14 +6,6 @@ using UrGUI.UWindow;
 namespace BattleImprove.UI.InGame;
 
 public class WindowUpdateCheck : WindowBase{
-    protected override void Start() {
-        if (Plugin.NeedUpdate) {
-            this.Init();
-        } else {
-            Destroy(this);
-        }
-    }
-    
     protected override void Init() {
         window = UWindow.Begin(Plugin.i18n.GetText("UpdateCheck.title", "Update Check"));
         StartPosition(0, 0);

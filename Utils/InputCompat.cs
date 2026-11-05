@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,6 +12,24 @@ namespace BattleImprove.Utils;
 /// polling keeps working (and stops flooding the log / silently killing Update loops).
 /// </summary>
 public static class InputCompat {
+    private static KeyCode[] mappedKeys;
+
+    /// <summary>
+    /// The key pressed this frame, for "press a key" prompts. Only keys <see cref="GetKeyDown"/> can
+    /// read back are reported, so a key picked here can always be used as a hotkey.
+    /// </summary>
+    public static bool TryGetAnyKeyDown(out KeyCode keyCode) {
+        keyCode = KeyCode.None;
+        mappedKeys ??= ((KeyCode[])Enum.GetValues(typeof(KeyCode))).Where(k => Map(k) != Key.None).ToArray();
+        foreach (var candidate in mappedKeys) {
+            if (!GetKeyDown(candidate)) continue;
+            keyCode = candidate;
+            return true;
+        }
+
+        return false;
+    }
+
     public static bool GetKeyDown(KeyCode keyCode) {
         var kb = Keyboard.current;
         if (kb == null) return false;

@@ -9,6 +9,11 @@ using UrGUI.UWindow;
 namespace BattleImprove.Components;
 
 public class MenuController : PluginInstance<MenuController> {
+    // The game keeps its locks in lists of this enum and only compares the values, so a value of our
+    // own is ours alone. With LockStatePadlock.Paused, closing this menu would release the lock of a
+    // pause menu opened on top of it, and the other way round.
+    private const LockStatePadlock MenuPadlock = (LockStatePadlock)1000;
+
     protected Dictionary<string, WindowBase> windos = new Dictionary<string, WindowBase>();
     protected WindowBase currentWindow;
     protected WindowBase menu;
@@ -20,7 +25,8 @@ public class MenuController : PluginInstance<MenuController> {
     }
 
     private void Start() {
-        var window = this.gameObject.AddComponent<WindowUpdateCheck>().SetController(this);
+        StartCoroutine(UpdateChecker.CheckForUpdate(() =>
+            this.gameObject.AddComponent<WindowUpdateCheck>().SetController(this)));
         InitWindow();
 
         // UrGUI controls keep the caption they were created with, so the windows are the thing that
@@ -117,8 +123,8 @@ public class MenuController : PluginInstance<MenuController> {
     public void Pause(bool state) {
         var manager = StaticInstance<GameManager>.Instance;
         if (manager == null) return;
-        manager.ModifyCursorState(LockStatePadlock.Paused, state);
-        manager.ModifyControllerLock(LockStatePadlock.Paused, state);
+        manager.ModifyCursorState(MenuPadlock, state);
+        manager.ModifyControllerLock(MenuPadlock, state);
     }
     
     public void OpenSubWindow(string name, bool closeCurrent = true) {

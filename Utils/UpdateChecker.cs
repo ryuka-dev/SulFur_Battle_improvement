@@ -1,40 +1,50 @@
 ﻿using System;
-using System.Net;
+using System.Collections;
+using UnityEngine.Networking;
 
 namespace BattleImprove.Utils;
 
 public class UpdateChecker {
-    private const string UPDATE_URL = "https://api.github.com/repos/CmmmmmmLau/SulFur_Battle_improvement/releases/latest";
-    
-    public static bool CheckForUpdate() {
-        using WebClient client = new WebClient();
-        client.Headers.Add("User-Agent", "UnityModUpdater");
-            
+    private const string UPDATE_URL = "https://api.github.com/repos/ryuka-dev/SulFur_Battle_improvement/releases/latest";
+    private const int TIMEOUT_SECONDS = 5;
+
+    /// <summary>
+    /// Runs as a coroutine: this starts while the game is loading a save, and a synchronous request
+    /// would freeze the game for as long as GitHub takes to answer or to time out.
+    /// </summary>
+    public static IEnumerator CheckForUpdate(Action onNewVersion) {
+        using var request = UnityWebRequest.Get(UPDATE_URL);
+        request.timeout = TIMEOUT_SECONDS;
+        request.SetRequestHeader("User-Agent", "UnityModUpdater");
+
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success) {
+            Plugin.Logger.LogWarning($"Failed to check for update: {request.error}");
+            yield break;
+        }
+
         try {
-            var json = client.DownloadString(UPDATE_URL);
-            var currentVersion = MyPluginInfo.PLUGIN_VERSION;
-            var latestVersion = ExtractVersionFromJson(json);
-                
-            if (CheckUpdate(currentVersion, latestVersion)) {
+            var latestVersion = ExtractVersionFromJson(request.downloadHandler.text);
+
+            if (CheckUpdate(MyPluginInfo.PLUGIN_VERSION, latestVersion)) {
                 Plugin.Logger.LogInfo($"New version available: {latestVersion}");
-                return true;
+                onNewVersion();
             } else {
                 Plugin.Logger.LogInfo("No new version available.");
-                return false;
             }
-        } catch (WebException e) {
-            Plugin.Logger.LogError($"Failed to check for update: {e.Message}");
-            return false;
+        } catch (Exception e) {
+            Plugin.Logger.LogWarning($"Failed to read the update information: {e.Message}");
         }
     }
-    
+
     private static bool CheckUpdate(string current, string latest)
     {
         Version vCurrent = new Version(current);
         Version vLatest = new Version(latest);
         return vLatest > vCurrent;
     }
-    
+
     private static string ExtractVersionFromJson(string json)
     {
         int start = json.IndexOf("\"tag_name\":\"") + 12;

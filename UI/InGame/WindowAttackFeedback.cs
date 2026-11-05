@@ -93,6 +93,9 @@ public class WindowAttackFeedback : WindowBase{
     }
 
     private void TestKillMessage() {
+        // Absent when the asset bundle could not be loaded.
+        if (PluginInstance<MessageController>.Instance == null) return;
+
         PluginInstance<MessageController>.Instance.OnEnemyKill("Enemy Name#" + Random.Range(0, 10)
             , "Weapon Name#" + Random.Range(0, 10)
             , Random.Range(0, 10).ToString()
