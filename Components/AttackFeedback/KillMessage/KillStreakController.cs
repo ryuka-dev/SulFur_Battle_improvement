@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using BattleImprove.Utils;
 using PerfectRandom.Sulfur.Core;
 using TMPro;
 using UnityEngine;
@@ -36,9 +37,9 @@ public class KillStreakController : MonoBehaviour {
         }
         
 #if DEBUG
-        if (Input.GetKeyDown(KeyCode.Alpha3)) {
+        if (InputCompat.GetKeyDown(KeyCode.Alpha3)) {
             this.AddKillStreak();
-        } else if (Input.GetKeyDown(KeyCode.Alpha4)) {
+        } else if (InputCompat.GetKeyDown(KeyCode.Alpha4)) {
             Enumerable.Range(0,10).ToList().ForEach(x => this.AddKillStreak());
         }
 #endif

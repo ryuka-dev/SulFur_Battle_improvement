@@ -1,4 +1,3 @@
-using System.Linq;
 using BattleImprove.Utils;
 using HarmonyLib;
 using PerfectRandom.Sulfur.Core;
@@ -30,13 +29,18 @@ public class SoundPatch {
         // The killing blow stays silent, as it always has. A shot into a body that was already dead is
         // the corpse hit organ farming relies on, and only plays when the player asked for it.
         if (__instance.UnitState == UnitState.Dead && (__state || !Config.EnableDeadUnitFeedback.Value)) return;
-        if (AttackFeedbackPatch.Enemies == null || !AttackFeedbackPatch.Enemies.Contains(__instance)) return;
 
+        // Asked at the hit, not listed up front: the units of a level are still inactive while its
+        // loading screen is up, and enemies keep spawning or changing sides during play.
         var player = StaticInstance<GameManager>.Instance.PlayerUnit;
+        if (!__instance.IsHostileTo(player)) return;
+
         var collisionPoint = hitPosition ?? __instance.transform.position;
         var distance = Vector3.Distance(player.EyesPosition, __instance.transform.position);
 
-        var isHeadshot = hitbox.shapeId.part == HitboxColliders.Parts.Head;
+        // Read through a local: the Harmony analyzer reports member access on a non-ref patch parameter.
+        var hit = hitbox;
+        var isHeadshot = hit.shapeId.part == HitboxColliders.Parts.Head;
 
         if (source.damageType == DamageTypes.Critical || isHeadshot) {
             var soundPosition = Vector3.LerpUnclamped(player.transform.position, collisionPoint, data.indicatorDistanceHeadShoot);

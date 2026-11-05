@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -18,13 +17,10 @@ public static class PrefabManager {
         Plugin.LoggingInfo("Loading Asset Bundle...", true);
         // Load asset bundle
 
-#if DEBUG
-        var sAssemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        AssetBundle = AssetBundle.LoadFromFile(Path.Combine(sAssemblyLocation, "battle_improve"));
-#else
-        AssetBundle = AssetBundle.LoadFromStream(Assembly.GetExecutingAssembly()
-            .GetManifestResourceStream("BattleImprove.Assets.battle_improve"));
-#endif
+        // Without the embedded bundle the plugin carries on as it does with one the engine refuses.
+        // Throwing here would leave IsLoaded false, and the menu and the donation box helper with it.
+        var bundle = Assembly.GetExecutingAssembly().GetManifestResourceStream("BattleImprove.Assets.battle_improve");
+        AssetBundle = bundle != null ? AssetBundle.LoadFromStream(bundle) : null;
         if (AssetBundle == null) {
             // The bundle is built for a specific Unity version; a game engine upgrade makes it
             // unloadable (LoadFromStream returns null). Feature code must degrade gracefully.
@@ -56,7 +52,7 @@ public static class PrefabManager {
         // The asset may be absent when the bundle failed to load (engine version mismatch) or when a
         // specific asset is missing. Return null and let callers skip the visual instead of throwing.
         if (!Prefabs.TryGetValue(name, out var prefab) || prefab == null) {
-            Plugin.LoggingInfo($"Prefab '{name}' is unavailable; skipping (asset bundle not loaded?).");
+            Plugin.LoggingInfo($"Prefab '{name}' is unavailable; skipping (asset bundle not loaded?).", true);
             return null;
         }
         Plugin.LoggingInfo($"Loading {name} Prefab...", true);

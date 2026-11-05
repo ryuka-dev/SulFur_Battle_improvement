@@ -83,18 +83,20 @@ public class MessageController : PluginInstance<MessageController> {
     protected void Update() {
         UpdateTotalDamage();
 
-        if (isShowing && (timer += Time.deltaTime) > 5f) {
+        // A hit that does not kill shows the damage total without the banner, so the total runs the
+        // timer too: otherwise it stays up until the next kill.
+        if ((isShowing || gameobjectTotalDamage.activeSelf) && (timer += Time.deltaTime) > 5f) {
             // Hide the damage info after 5 seconds
             this.ResetDamageCounter();
             
             // And hide the message
-            HideMessage();
+            if (isShowing) HideMessage();
         }
 #if DEBUG
-        if (Input.GetKeyDown(KeyCode.Alpha1)) {
+        if (InputCompat.GetKeyDown(KeyCode.Alpha1)) {
             OnEnemyHit("Bullet Damage Type#" + Random.Range(0, 10), Random.Range(0, 100));
             OnEnemyKill("Enemy1", "Weapon1", "Exp1", false);
-        } else if (Input.GetKeyDown(KeyCode.Alpha2)) {
+        } else if (InputCompat.GetKeyDown(KeyCode.Alpha2)) {
             OnEnemyHit("Bullet Damage Type#" + Random.Range(0, 10), Random.Range(0, 100));
             OnEnemyKill("Enemy2", "Weapon2", "Exp2", true);
         }

@@ -37,7 +37,9 @@ public class KillMessagePatch : AttackFeedbackPatch {
         var enemyName = LocalizedUnitName(__instance);
         var weaponName = source.sourceWeapon != null ? source.sourceWeapon.weaponDefinition.LocalizedDisplayName : "";
         var exp = Convert.ToString(__instance.ExperienceOnKill);
-        var isHeadshot = hitbox.shapeId.part == HitboxColliders.Parts.Head;
+        // Read through a local: the Harmony analyzer reports member access on a non-ref patch parameter.
+        var hit = hitbox;
+        var isHeadshot = hit.shapeId.part == HitboxColliders.Parts.Head;
 
         Plugin.LoggingInfo("KillMessage: " + enemyName + " " + weaponName + " " + exp);
 
@@ -50,14 +52,20 @@ public class KillMessagePatch : AttackFeedbackPatch {
     /// for UI. Its own UI shows unit names through <c>UnitSO.LocalizedIdentifier()</c>, which looks up
     /// the <c>UnitNames/&lt;asset&gt;</c> term. That method returns <c>displayName</c> unchanged when no
     /// term exists, so treat that as "not translated" and keep the faction-prefixed name we showed before
-    /// rather than dropping the prefix for locales the game has no unit names for.
+    /// rather than dropping the prefix for locales the game has no unit names for. Some display names
+    /// already start with the adjective ("Corrupted Spearman"); those must not get it a second time.
     /// </summary>
     private static string LocalizedUnitName(Unit unit) {
         var unitSo = unit.unitSO;
         if (unitSo == null) return unit.SourceName;
 
         var localized = unitSo.LocalizedIdentifier();
-        if (string.IsNullOrEmpty(localized) || localized == unitSo.displayName) return unit.SourceName;
+        if (string.IsNullOrEmpty(localized) || localized == unitSo.displayName) {
+            var prefixed = unit.SourceName;
+            var prefixLength = prefixed.Length - unitSo.displayName.Length;
+            var hasDoubledPrefix = prefixLength > 0 && unitSo.displayName.StartsWith(prefixed.Substring(0, prefixLength));
+            return hasDoubledPrefix ? unitSo.displayName : prefixed;
+        }
 
         return localized;
     }
