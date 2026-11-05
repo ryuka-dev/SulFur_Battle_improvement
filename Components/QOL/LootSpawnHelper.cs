@@ -26,34 +26,57 @@ public class LootSpawnHelper : PluginInstance<LootSpawnHelper> {
         // Saving with opened=true clears keptItems.weapons, so the coroutine iterates a copy.
         var weapons = new List<InventoryData>(keptItems.weapons);
         keptItems.opened = true;
-        DataManager.SaveDeadProtectionData();
+        // Started before the save: if writing the file fails, the copy above is all that is left.
         this.StartCoroutine(SpawnWeapon(weapons, transform));
+        DataManager.SaveDeadProtectionData();
     }
 
     private IEnumerator SpawnWeapon(List<InventoryData> weapons, Transform transform) {
-        
+        // The box already counts as opened, so a weapon that cannot be spawned has to go back in by
+        // hand or it is gone. It may be an item from a mod that is switched off for now.
+        var notSpawned = new List<InventoryData>();
+
         foreach (var item in weapons) {
-            var itemDef = item.id.GetAsset();
-            item.attachmentIds = RandomDeleteElement(item.attachmentIds, data.attachmentChance);
-            item.enchantmentIds = RandomDeleteElement(item.enchantmentIds, data.enchantmentChance);
-            // barrelChance: chance to lose the modded caliber and revert to the weapon's default.
-            if (item.caliberId != CaliberTypes.None && Random.Range(0f, 1f) < data.barrelChance) {
-                item.caliberId = CaliberTypes.None;
+            try {
+                SpawnWeapon(item, transform);
+            } catch (Exception e) {
+                Plugin.Logger.LogWarning($"Could not return saved weapon {item.id}, keeping it for the next time: {e}");
+                notSpawned.Add(item);
             }
 
-            var room = StaticInstance<GameManager>.Instance.PlayerUnit.currentRoom;
-            
-            // var pickUp = StaticInstance<LootManager>.Instance.SpawnItem(itemDef, new Vector3(transform.position.x, transform.position.y, transform.position.z + 0.08f), LootSpawnBehaviour.None, false);
-            var pickUp = StaticInstance<InteractionManager>.Instance.SpawnPickup(
-                new Vector3(transform.position.x, transform.position.y, transform.position.z + 0.08f),
-                false,
-                itemDef,
-                room,
-                item,
-                null,
-                0.75f);
             yield return new WaitForSeconds(1f);
         }
+
+        if (notSpawned.Count == 0) yield break;
+
+        DataManager.DeadProtectionData.weapons.AddRange(notSpawned);
+        DataManager.SaveDeadProtectionData(true);
+    }
+
+    private void SpawnWeapon(InventoryData item, Transform transform) {
+        InventoryData.HANDLE_LEGACY(item);
+        var itemDef = item.id.GetAsset();
+        if (itemDef == null) throw new InvalidOperationException("the item no longer exists");
+
+        item.attachmentIds = RandomDeleteElement(item.attachmentIds, data.attachmentChance);
+        item.enchantmentIds = RandomDeleteElement(item.enchantmentIds, data.enchantmentChance);
+        // barrelChance: chance to lose the modded caliber and revert to the weapon's default.
+        if (item.caliberId != CaliberTypes.None && Random.Range(0f, 1f) < data.barrelChance) {
+            item.caliberId = CaliberTypes.None;
+        }
+
+        var room = StaticInstance<GameManager>.Instance.PlayerUnit.currentRoom;
+
+        var pickup = StaticInstance<InteractionManager>.Instance.SpawnPickup(
+            new Vector3(transform.position.x, transform.position.y, transform.position.z + 0.08f),
+            false,
+            itemDef,
+            room,
+            item,
+            null,
+            0.75f);
+        // The game refuses items that are not allowed in this build without throwing.
+        if (pickup == null) throw new InvalidOperationException("the game refused to spawn the item");
     }
     
     private ItemId[] RandomDeleteElement(ItemId[] array, float chance) {

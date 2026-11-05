@@ -29,11 +29,18 @@ public class DeadProtection {
         Plugin.LoggingInfo("Player died, saving weapon! Quick!!!");
         var itemData = DataManager.DeadProtectionData;
         var weapons = itemData.weapons;
-        weapons.Clear();
+        // Weapons from an earlier death that were never collected stay in the box, as the game's own
+        // insured items do. Saving with opened set has already emptied the list otherwise.
+        if (itemData.opened) weapons.Clear();
+
         
         var equipment = StaticInstance<GameManager>.Instance.PlayerUnit.GetComponent<EquipmentManager>().EquippedHoldables;
         foreach (var inventoryItem in equipment.Select(item => item.Value)) {
             if (inventoryItem.SlotType != SlotType.Weapon) {
+                continue;
+            }
+            // The game's own insurance returns this one through the same box right after this prefix.
+            if (inventoryItem.HasAttachment(ItemIds.Attachment_Insurance.GetAsset())) {
                 continue;
             }
             var itemdef = inventoryItem.itemDefinition as WeaponSO;

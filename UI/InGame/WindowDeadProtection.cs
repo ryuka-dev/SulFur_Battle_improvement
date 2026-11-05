@@ -18,7 +18,8 @@ public class WindowDeadProtection : WindowBase{
         window.Width += 50;
         StartPosition(310, 100);
         window.Label(i18n.GetText("DeadProtection.durability", "Weapon Durability Loss (%)"));
-        window.Slider("", OnDurabilityChange, data.weaponDurability, 0, 1, true);
+        // weaponDurability is stored as the part the weapon keeps; the slider shows the part it loses.
+        window.Slider("", OnDurabilityChange, 1 - data.weaponDurability, 0, 1, true);
         window.Label(i18n.GetText("DeadProtection.barrel", "Barrel Loss Probability (%)"));
         window.Slider("", OnBarrelChange, data.barrelChance, 0, 1, true);
         window.Label(i18n.GetText("DeadProtection.attachment", "Attachment Loss Probability (%)"));
@@ -30,7 +31,7 @@ public class WindowDeadProtection : WindowBase{
     }
     
     private void OnDurabilityChange(float value) {
-        data.weaponDurability = MathF.Round(value, 2);
+        data.weaponDurability = MathF.Round(1 - value, 2);
     }
     
     private void OnAttachmentChange(float value) {
