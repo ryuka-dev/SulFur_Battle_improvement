@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.5.9
 Experience share no longer gives XP to a max rank weapon. The game has left those weapons out of the XP distribution since 1.0; this also respects the rank cap of Enchantments Unbound.
 
 SULFUR Together: joining players now get damage numbers, the kill banner, its sound and the kill crosshair. The banner shows when you earn the experience for a kill, so it also appears if you hit an enemy and the host finishes it. Against bosses the damage numbers are an estimate.
