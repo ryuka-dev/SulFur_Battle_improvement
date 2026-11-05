@@ -16,7 +16,8 @@ public class DamageInfoPatch : AttackFeedbackPatch {
         __state = (__instance.GetCurrentHealth(), WasAliveBeforeHit(__instance));
     }
 
-    private static void Postfix(Npc __instance, ref DamageSourceData source, (float Health, bool Alive) __state) {
+    private static void Postfix(Npc __instance, float damage, ref DamageSourceData source,
+        (float Health, bool Alive) __state, bool __runOriginal) {
         if (PluginInstance<MessageController>.Instance == null) return;
         if (!TargetCheck(source)) return;
 
@@ -29,8 +30,11 @@ public class DamageInfoPatch : AttackFeedbackPatch {
         // Damage numbers for hits on an already dead body are opt-in.
         if (!wasAliveBeforeHit && !Config.EnableDeadUnitFeedback.Value) return;
 
-        var damage = healthBeforeHit - __instance.GetCurrentHealth();
-        if (damage <= 0) return;
+        var dealt = healthBeforeHit - __instance.GetCurrentHealth();
+        // A co-op client hands its hit to the host and skips the game's method, so health has not moved
+        // yet. The host takes the amount passed in here, up to the health the enemy has left.
+        if (!__runOriginal && !__instance.isInvulnerable) dealt = Math.Min(damage, healthBeforeHit);
+        if (dealt <= 0) return;
 
         var def = source.sourceWeapon != null ? source.sourceWeapon.weaponDefinition : null;
         string type;
@@ -44,6 +48,6 @@ public class DamageInfoPatch : AttackFeedbackPatch {
             }
         }
 
-        PluginInstance<MessageController>.Instance.OnEnemyHit(type, Convert.ToInt32(damage));
+        PluginInstance<MessageController>.Instance.OnEnemyHit(type, Convert.ToInt32(dealt));
     }
 }
