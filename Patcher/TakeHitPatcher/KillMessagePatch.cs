@@ -23,6 +23,8 @@ public class KillMessagePatch : AttackFeedbackPatch {
         if (PluginInstance<MessageController>.Instance == null) return;
         if (!TargetCheck(source)) return;
 
+        LastHitWeapon[__instance] = source.sourceWeapon;
+
         // Only the hit that took the unit down announces a kill. Shooting a body something else
         // killed is a corpse hit, not a kill of the player's, and must not claim one.
         if (!__state) return;
@@ -31,15 +33,19 @@ public class KillMessagePatch : AttackFeedbackPatch {
 
         var point = hitPosition ?? __instance.transform.position;
         var distance = Vector3.Distance(StaticInstance<GameManager>.Instance.PlayerUnit.EyesPosition, point);
-        var isFarRangeWeapon = source.sourceWeapon != null &&
-                               source.sourceWeapon.holdableWeightClass is HoldableWeightClass.Rifle or HoldableWeightClass.Sniper;
-
-        var enemyName = LocalizedUnitName(__instance);
-        var weaponName = source.sourceWeapon != null ? source.sourceWeapon.weaponDefinition.LocalizedDisplayName : "";
-        var exp = Convert.ToString(__instance.ExperienceOnKill);
         // Read through a local: the Harmony analyzer reports member access on a non-ref patch parameter.
         var hit = hitbox;
         var isHeadshot = hit.shapeId.part == HitboxColliders.Parts.Head;
+
+        Announce(__instance, source.sourceWeapon, Convert.ToString(__instance.ExperienceOnKill), isHeadshot, distance);
+    }
+
+    internal static void Announce(Npc enemy, Weapon weapon, string exp, bool isHeadshot, float distance) {
+        var isFarRangeWeapon = weapon != null &&
+                               weapon.holdableWeightClass is HoldableWeightClass.Rifle or HoldableWeightClass.Sniper;
+
+        var enemyName = LocalizedUnitName(enemy);
+        var weaponName = weapon != null ? weapon.weaponDefinition.LocalizedDisplayName : "";
 
         Plugin.LoggingInfo("KillMessage: " + enemyName + " " + weaponName + " " + exp);
 

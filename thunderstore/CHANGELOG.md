@@ -3,6 +3,8 @@
 ## Unreleased
 Experience share no longer gives XP to a max rank weapon. The game has left those weapons out of the XP distribution since 1.0; this also respects the rank cap of Enchantments Unbound.
 
+SULFUR Together: joining players now get the kill banner, its sound and the kill crosshair. It shows when you earn the experience for a kill, so it also appears if you hit an enemy and the host finishes it. Damage numbers are still missing for joining players.
+
 Fixed the kill banner failing when a loading screen was left by anything other than the continue key. The kill went unannounced and its damage total stayed on screen until the next kill.
 
 Fixed hit sounds missing for most enemies in a level. The list of enemies was read while the level was still loading, when almost none of them count as present yet.

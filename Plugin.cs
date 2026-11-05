@@ -134,6 +134,7 @@ public class Plugin : BaseUnityPlugin {
         TryPatch(typeof(SoundPatch));
         TryPatch(typeof(DamageInfoPatch));
         TryPatch(typeof(KillMessagePatch));
+        TryPatch(typeof(CreditedKillPatch));
         TryPatch(typeof(CrossHairPatch));
 
         LoggingInfo("Patching complete!");

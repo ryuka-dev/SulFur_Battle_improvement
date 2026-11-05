@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using HarmonyLib;
 using PerfectRandom.Sulfur.Core;
 using PerfectRandom.Sulfur.Core.Units;
+using PerfectRandom.Sulfur.Core.Weapons;
 
 namespace BattleImprove.Patcher.TakeHitPatcher;
 
@@ -12,6 +13,8 @@ namespace BattleImprove.Patcher.TakeHitPatcher;
 // passes through. Patching Npc directly also removes the need to filter out player/Breakable.
 public class AttackFeedbackPatch {
     internal static List<Unit> KilledEnemies = new();
+    // The weapon of the player's latest hit on each enemy, for a kill reported after the hit.
+    internal static Dictionary<Unit, Weapon> LastHitWeapon = new();
 
     // The game's own "leave the loading screen" step. The continue key is only one caller of it, so
     // hooking the key's input callback misses every other way past the screen.
@@ -19,6 +22,7 @@ public class AttackFeedbackPatch {
     [HarmonyPostfix, HarmonyPatch(typeof(GameManager), nameof(GameManager.ContinueFromTransition))]
     private static void ResetKilledEnemies() {
         KilledEnemies = new List<Unit>();
+        LastHitWeapon = new Dictionary<Unit, Weapon>();
     }
 
     // Only react to damage dealt by the player.
