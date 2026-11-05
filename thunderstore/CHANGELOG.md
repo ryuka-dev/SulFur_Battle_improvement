@@ -5,6 +5,32 @@ Experience share no longer gives XP to a max rank weapon. The game has left thos
 
 Fixed the kill banner failing when a loading screen was left by anything other than the continue key. The kill went unannounced and its damage total stayed on screen until the next kill.
 
+Fixed hit sounds missing for most enemies in a level. The list of enemies was read while the level was still loading, when almost none of them count as present yet.
+
+Fixed the damage total staying on screen after a hit that did not kill. It now clears after 5 seconds, like the kill banner.
+
+Fixed enemy names on the kill banner repeating their faction, such as "Corrupted Corrupted Spearman".
+
+Experience share now only runs when you actually earned the kill. A kill by another enemy or a hazard used to feed your second weapon too.
+
+With bullets through corpses on, the shot that kills an enemy now stops there, as it does in the game. It used to carry on into whatever stood behind.
+
+Death protection:
+- A second death no longer throws away weapons you had not collected yet. They now wait in the donation box together.
+- An equipped weapon with an insurance attachment is left to the game's own insurance, so it no longer comes back twice.
+- A weapon that cannot be returned, such as one from a mod that is switched off, stays in the box for next time instead of being lost.
+- The durability slider now shows what it says. It was labelled as loss but set the part the weapon keeps, so the default of 30% actually removed 70%. Your setting and its effect are unchanged, only the number shown is corrected.
+
+The update check no longer freezes the game while a save loads when GitHub is slow or unreachable, which may be behind reports of endless loading. It also looks at this mod's own releases now, so new versions are actually announced.
+
+The hotkey window now works. Closing it without pressing a key keeps your current key.
+
+Opening the F1 menu over the pause menu no longer releases the pause menu's cursor and controls when you close it again.
+
+A damaged settings file no longer resets everything silently. What can be read is kept, the rest goes back to defaults, and a copy of the damaged file is left next to it.
+
+A game update that breaks one feature no longer stops the rest of the mod from loading.
+
 ## 1.5.8
 Fixed death protection duplicating weapons.
 
