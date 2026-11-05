@@ -58,12 +58,7 @@ public class LootSpawnHelper : PluginInstance<LootSpawnHelper> {
         var itemDef = item.id.GetAsset();
         if (itemDef == null) throw new InvalidOperationException("the item no longer exists");
 
-        item.attachmentIds = RandomDeleteElement(item.attachmentIds, data.attachmentChance);
-        item.enchantmentIds = RandomDeleteElement(item.enchantmentIds, data.enchantmentChance);
-        // barrelChance: chance to lose the modded caliber and revert to the weapon's default.
-        if (item.caliberId != CaliberTypes.None && Random.Range(0f, 1f) < data.barrelChance) {
-            item.caliberId = CaliberTypes.None;
-        }
+        RollLosses(item, data);
 
         var room = StaticInstance<GameManager>.Instance.PlayerUnit.currentRoom;
 
@@ -79,7 +74,17 @@ public class LootSpawnHelper : PluginInstance<LootSpawnHelper> {
         if (pickup == null) throw new InvalidOperationException("the game refused to spawn the item");
     }
     
-    private ItemId[] RandomDeleteElement(ItemId[] array, float chance) {
+    /// <summary>What a saved weapon loses on the way back, with the chances set in the menu.</summary>
+    internal static void RollLosses(InventoryData item, PluginData.DeadProtection settings) {
+        item.attachmentIds = RandomDeleteElement(item.attachmentIds, settings.attachmentChance);
+        item.enchantmentIds = RandomDeleteElement(item.enchantmentIds, settings.enchantmentChance);
+        // barrelChance: chance to lose the modded caliber and revert to the weapon's default.
+        if (item.caliberId != CaliberTypes.None && Random.Range(0f, 1f) < settings.barrelChance) {
+            item.caliberId = CaliberTypes.None;
+        }
+    }
+
+    private static ItemId[] RandomDeleteElement(ItemId[] array, float chance) {
         if (array == null) return null;
         var list = new List<ItemId>(array);
 

@@ -27,13 +27,12 @@ public class DeadProtection {
         }
 
         Plugin.LoggingInfo("Player died, saving weapon! Quick!!!");
-        var itemData = DataManager.DeadProtectionData;
-        var weapons = itemData.weapons;
-        // Weapons from an earlier death that were never collected stay in the box, as the game's own
-        // insured items do. Saving with opened set has already emptied the list otherwise.
-        if (itemData.opened) weapons.Clear();
+        var settings = DataManager.DeadProtectionData;
+        // The game's insured items belong to this save slot and are written with it, and the donation
+        // box hands them out, stays lit for them and clears them. The death that brought us here saves
+        // the slot right after this prefix, so nothing of ours has to be written.
+        var insuredItems = SulfurSaveState.active.INSURED_ITEMS;
 
-        
         var equipment = StaticInstance<GameManager>.Instance.PlayerUnit.GetComponent<EquipmentManager>().EquippedHoldables;
         foreach (var inventoryItem in equipment.Select(item => item.Value)) {
             if (inventoryItem.SlotType != SlotType.Weapon) {
@@ -47,25 +46,25 @@ public class DeadProtection {
             Plugin.LoggingInfo("Saved item: " + itemdef.LocalizedDisplayName);
             
             Plugin.LoggingInfo("Durability Current: " + inventoryItem.DurabilityCurrent);
-            inventoryItem.ModifyDurability(-inventoryItem.DurabilityCurrent * (1 - itemData.weaponDurability));
+            inventoryItem.ModifyDurability(-inventoryItem.DurabilityCurrent * (1 - settings.weaponDurability));
             Plugin.LoggingInfo("Durability Modified: " + inventoryItem.DurabilityCurrent);
-            
-            Plugin.LoggingInfo("Grabbing item data...");
-            var InventoryData = new InventoryData(itemdef.id, inventoryItem.gridPosition.x, inventoryItem.gridPosition.y, inventoryItem.quantity,
-                inventoryItem.currentAmmo, inventoryItem.CurrentCaliber, inventoryItem.stats.SerializedAttributeData(),
-                inventoryItem.GetSerializedAttachments(), inventoryItem.GetSerializedEnchantments(),
-                0, inventoryItem.InventorySize.x, inventoryItem.InventorySize.y, false, false);
-            
-            Plugin.LoggingInfo("Saving item data...");
-            weapons.Add(InventoryData);
+
+            var saved = inventoryItem.GetSerialized();
+            LootSpawnHelper.RollLosses(saved, settings);
+            insuredItems.Add(saved);
         }
-        
-        DataManager.SaveDeadProtectionData(true);
     }
-    
+
+    /// <summary>
+    /// Returns weapons an older version left in the plugin's own file, which every save slot shares.
+    /// New deaths go through the game's insured items instead, so this runs at most once per player:
+    /// the first box opened in any slot empties the list.
+    /// </summary>
     [HarmonyWrapSafe]
     [HarmonyPostfix, HarmonyPatch(typeof(ChurchCollectionLootable), "Loot")]
     private static void ReturnPlayerEquipment(ChurchCollectionLootable __instance) {
+        if (DataManager.DeadProtectionData.weapons.Count == 0) return;
+
         Plugin.LoggingInfo("Donation box opened, popping equipment back!");
         var transform = Traverse.Create(__instance).Field("lootSpawnTransform").GetValue<Transform>();
         if (transform == null) {

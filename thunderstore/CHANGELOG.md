@@ -16,6 +16,7 @@ Experience share now only runs when you actually earned the kill. A kill by anot
 With bullets through corpses on, the shot that kills an enemy now stops there, as it does in the game. It used to carry on into whatever stood behind.
 
 Death protection:
+- Saved weapons now belong to the save slot you died in. They used to sit in one file shared by every slot, so a weapon could come back in the wrong save. Weapons saved by an earlier version are handed out one last time by the first donation box you open, in any slot.
 - A second death no longer throws away weapons you had not collected yet. They now wait in the donation box together.
 - An equipped weapon with an insurance attachment is left to the game's own insurance, so it no longer comes back twice.
 - A weapon that cannot be returned, such as one from a mod that is switched off, stays in the box for next time instead of being lost.
