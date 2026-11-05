@@ -18,16 +18,18 @@ namespace BattleImprove.Utils;
 ///
 /// The language follows the game, not the operating system: <see cref="I2Loc.CurrentLanguageCode"/>
 /// is the code the player picked in the options screen, and it is exactly the file name in
-/// <c>lang/</c>. Every lookup falls back to the English text passed by the caller, so a missing or
+/// <c>lang/</c>, with one exception handled in <see cref="GameLanguageCode"/>. Every lookup falls back to the English text passed by the caller, so a missing or
 /// unreadable file degrades to English rather than to raw keys.
 /// </summary>
 public class LocalizationManager {
     /// <summary>The languages the game itself ships, and therefore the file names in <c>lang/</c>.</summary>
     public static readonly string[] SupportedLanguageCodes = {
-        "en", "sv", "fr", "it", "de", "es", "pt", "ru", "pl", "ja", "ko", "zh-CN", "tr", "ar"
+        "en", "sv", "fr", "it", "de", "es", "pt", "ru", "pl", "ja", "ko", "zh-CN", "tr", "zh-TW", "ar"
     };
 
     private const string BaseLanguage = "en";
+    private const string TraditionalChinese = "zh-TW";
+    private const string SimplifiedChinese = "zh-CN";
 
     private readonly string pluginDirectory;
     private Dictionary<string, string> strings = new();
@@ -106,7 +108,11 @@ public class LocalizationManager {
 
     private static string GameLanguageCode() {
         try {
-            return I2Loc.CurrentLanguageCode;
+            // The Traditional Chinese font set is its own I2 source, coded "zh". At startup it comes
+            // before the main source and wins the code lookup; after an in-game change it comes after
+            // it and the code is "zh-TW". Same language, so use one code.
+            var code = I2Loc.CurrentLanguageCode;
+            return code == "zh" ? TraditionalChinese : code;
         } catch (Exception e) {
             Plugin.LoggingInfo("Could not read the game language: " + e.Message);
             return null;
@@ -156,8 +162,9 @@ public class LocalizationManager {
     }
 
     /// <summary>
-    /// The file names to overlay, in order. A regional code the plugin has no file for (zh-TW, pt-BR)
-    /// falls back to the base language part before English.
+    /// The file names to overlay, in order. A regional code the plugin has no file for (pt-BR) falls
+    /// back to the base language part before English. Traditional Chinese also reads Simplified
+    /// Chinese before English, the same order as SULFUR Native UI Lib's lookups.
     /// </summary>
     private static IEnumerable<string> FileCandidates(string code) {
         yield return BaseLanguage;
@@ -165,6 +172,7 @@ public class LocalizationManager {
 
         var separator = code.IndexOf('-');
         if (separator > 0) yield return code.Substring(0, separator);
+        if (code == TraditionalChinese) yield return SimplifiedChinese;
 
         yield return code;
     }
