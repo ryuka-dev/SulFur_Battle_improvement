@@ -3,6 +3,8 @@
 ## Unreleased
 Experience share no longer gives XP to a max rank weapon. The game has left those weapons out of the XP distribution since 1.0; this also respects the rank cap of Enchantments Unbound.
 
+Fixed the kill banner failing when a loading screen was left by anything other than the continue key. The kill went unannounced and its damage total stayed on screen until the next kill.
+
 ## 1.5.8
 Fixed death protection duplicating weapons.
 

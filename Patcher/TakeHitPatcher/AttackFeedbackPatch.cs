@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
 using PerfectRandom.Sulfur.Core;
-using PerfectRandom.Sulfur.Core.Input;
 using PerfectRandom.Sulfur.Core.Units;
 
 namespace BattleImprove.Patcher.TakeHitPatcher;
@@ -14,10 +13,12 @@ namespace BattleImprove.Patcher.TakeHitPatcher;
 // passes through. Patching Npc directly also removes the need to filter out player/Breakable.
 public class AttackFeedbackPatch {
     internal static Npc[] Enemies;
-    internal static List<Unit> KilledEnemies;
+    internal static List<Unit> KilledEnemies = new();
 
+    // The game's own "leave the loading screen" step. The continue key is only one caller of it, so
+    // hooking the key's input callback misses every other way past the screen.
     [HarmonyWrapSafe]
-    [HarmonyPostfix, HarmonyPatch(typeof(InputReader), "LoadingContinue")]
+    [HarmonyPostfix, HarmonyPatch(typeof(GameManager), nameof(GameManager.ContinueFromTransition))]
     private static void ResetList() {
         Enemies = StaticInstance<UnitManager>.Instance.GetAllNpcs()
             .Where(npc => npc.IsHostileTo(StaticInstance<GameManager>.Instance.PlayerUnit)).ToArray();
