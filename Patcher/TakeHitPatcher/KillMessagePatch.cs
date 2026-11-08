@@ -18,7 +18,8 @@ public class KillMessagePatch : AttackFeedbackPatch {
     }
 
     private static void Postfix(Npc __instance, ref DamageSourceData source, Hitmesh.Data hitbox, Vector3? hitPosition,
-        bool __state) {
+        bool __state, bool __runOriginal) {
+        if (IsReportedByHost(__runOriginal)) return;
         if (!Config.EnableDamageMessage.Value) return;
         if (PluginInstance<MessageController>.Instance == null) return;
         if (!TargetCheck(source)) return;
@@ -40,7 +41,7 @@ public class KillMessagePatch : AttackFeedbackPatch {
         Announce(__instance, source.sourceWeapon, Convert.ToString(__instance.ExperienceOnKill), isHeadshot, distance);
     }
 
-    internal static void Announce(Npc enemy, Weapon weapon, string exp, bool isHeadshot, float distance) {
+    internal static void Announce(Unit enemy, Weapon weapon, string exp, bool isHeadshot, float distance) {
         var isFarRangeWeapon = weapon != null &&
                                weapon.holdableWeightClass is HoldableWeightClass.Rifle or HoldableWeightClass.Sniper;
 

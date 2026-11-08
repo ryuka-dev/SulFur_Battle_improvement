@@ -1,4 +1,5 @@
 using System;
+using BattleImprove.Integration;
 using BattleImprove.Utils;
 using HarmonyLib;
 using PerfectRandom.Sulfur.Core;
@@ -15,6 +16,9 @@ namespace BattleImprove.Patcher.TakeHitPatcher;
 // The game calls DistributeExperience only from GiveExperience, and that run is already announced by
 // KillMessagePatch, which knows the hit. A credit from anywhere else is a kill nothing has announced.
 // Asking that instead of "are we a co-op client" keeps the co-op mod out of this assembly.
+//
+// This is the fallback for a co-op mod that does not report its client's kills. When one does,
+// ClientHitFeedback announces them instead, knowing the killing hit.
 public class CreditedKillPatch : AttackFeedbackPatch {
     private static bool inGameCredit;
 
@@ -32,6 +36,7 @@ public class CreditedKillPatch : AttackFeedbackPatch {
     [HarmonyPostfix, HarmonyPatch(typeof(Npc), "DistributeExperience")]
     private static void AnnounceCreditedKill(Npc __instance, int totalExperience) {
         if (inGameCredit || totalExperience <= 0) return;
+        if (CoopCombat.ClientHitsReported) return;
         if (KilledEnemies.Contains(__instance)) return;
         KilledEnemies.Add(__instance);
 

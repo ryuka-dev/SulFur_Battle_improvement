@@ -18,13 +18,12 @@ public class SoundPatch {
     }
 
     private static void Postfix(Npc __instance, ref DamageSourceData source, Hitmesh.Data hitbox, Vector3? hitPosition,
-        bool __state) {
+        bool __state, bool __runOriginal) {
+        if (AttackFeedbackPatch.IsReportedByHost(__runOriginal)) return;
         if (!Config.EnableSoundFeedback.Value) return;
         if (PluginInstance<HitSoundEffect>.Instance == null) return;
         // Only play the hit sound for the player's own hits.
-        if (source.sourceUnit == null || !source.sourceUnit.isPlayer) return;
-
-        data ??= DataManager.AttackFeedbackData;
+        if (!AttackFeedbackPatch.TargetCheck(source)) return;
 
         // The killing blow stays silent, as it always has. A shot into a body that was already dead is
         // the corpse hit organ farming relies on, and only plays when the player asked for it.
@@ -42,7 +41,13 @@ public class SoundPatch {
         var hit = hitbox;
         var isHeadshot = hit.shapeId.part == HitboxColliders.Parts.Head;
 
-        if (source.damageType == DamageTypes.Critical || isHeadshot) {
+        Play(player, collisionPoint, distance, source.damageType == DamageTypes.Critical || isHeadshot);
+    }
+
+    internal static void Play(Unit player, Vector3 collisionPoint, float distance, bool isStrongHit) {
+        data ??= DataManager.AttackFeedbackData;
+
+        if (isStrongHit) {
             var soundPosition = Vector3.LerpUnclamped(player.transform.position, collisionPoint, data.indicatorDistanceHeadShoot);
             PluginInstance<HitSoundEffect>.Instance.PlayHitSound(soundPosition, true, volume: data.indicatorVolume);
         } else if (distance < 20) {

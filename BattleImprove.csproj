@@ -48,6 +48,7 @@
     <ItemGroup>
         <Compile Remove="_decompiled\**\*.cs" />
         <Compile Remove="UI\UrGUI\**\*.cs" />
+        <Compile Remove="Integration.SulfurTogether\**\*.cs" />
     </ItemGroup>
 
     <!-- Stage the freshly built plugin and its bundled dependency into the Thunderstore package folder so
@@ -55,6 +56,16 @@
     <Target Name="DeployToThunderstore" AfterTargets="Build" Condition="'$(DeployToSulfurProfile)' == 'true'">
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)\thunderstore" />
         <Copy SourceFiles="$(MSBuildProjectDirectory)\libs\UrGUI.dll" DestinationFolder="$(MSBuildProjectDirectory)\thunderstore" />
+        <!-- The package carries the optional co-op adapter too. It references this project, so the nested
+             build is told not to come back here. Restore runs on its own, with a property of its own, so
+             the build that follows evaluates the project with what the restore generated. -->
+        <MSBuild Condition="'$(StagingCoopAdapter)' != 'true'"
+                 Projects="$(MSBuildProjectDirectory)\Integration.SulfurTogether\BattleImprove.SulfurTogether.csproj"
+                 Targets="Restore"
+                 Properties="StagingCoopAdapter=true;MSBuildRestoreSessionId=$([System.Guid]::NewGuid())" />
+        <MSBuild Condition="'$(StagingCoopAdapter)' != 'true'"
+                 Projects="$(MSBuildProjectDirectory)\Integration.SulfurTogether\BattleImprove.SulfurTogether.csproj"
+                 Properties="StagingCoopAdapter=true" />
     </Target>
 
     <!-- The menu text is read from disk at runtime, so a local test install needs the lang folder beside

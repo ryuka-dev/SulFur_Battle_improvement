@@ -65,6 +65,14 @@ For older version, please try the older released mod.
 # Know Issue
 Currently only able to record player's bullet damage. Other type of damage date not include the damage source, therefore it will take more work to try to record it.
 
+**Without SULFUR Together you'll see one error in the log. You can ignore it.**
+
+```ini
+[Error  :   BepInEx] Could not load [BattleImprove - SULFUR Together Adapter x.y.z] because it has missing dependencies: com.ryuka.sulfur.together
+```
+
+That's the co-op adapter being skipped because SULFUR Together isn't installed. BattleImprove itself still loads and works.
+
 # Copyright
 Audio/Texture: Electronic Arts, DICE
 

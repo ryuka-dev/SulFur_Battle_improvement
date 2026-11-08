@@ -18,6 +18,7 @@ public class DamageInfoPatch : AttackFeedbackPatch {
 
     private static void Postfix(Npc __instance, float damage, ref DamageSourceData source,
         (float Health, bool Alive) __state, bool __runOriginal) {
+        if (IsReportedByHost(__runOriginal)) return;
         if (PluginInstance<MessageController>.Instance == null) return;
         if (!TargetCheck(source)) return;
 
@@ -31,23 +32,12 @@ public class DamageInfoPatch : AttackFeedbackPatch {
         if (!wasAliveBeforeHit && !Config.EnableDeadUnitFeedback.Value) return;
 
         var dealt = healthBeforeHit - __instance.GetCurrentHealth();
-        // A co-op client hands its hit to the host and skips the game's method, so health has not moved
-        // yet. The host takes the amount passed in here, up to the health the enemy has left.
+        // A co-op client whose hits are not reported back (a co-op mod without that API) hands its hit to
+        // the host and skips the game's method, so health has not moved yet. The amount passed in here is
+        // the closest estimate, up to the health the enemy has left.
         if (!__runOriginal && !__instance.isInvulnerable) dealt = Math.Min(damage, healthBeforeHit);
         if (dealt <= 0) return;
 
-        var def = source.sourceWeapon != null ? source.sourceWeapon.weaponDefinition : null;
-        string type;
-        if (source.melee && def != null) {
-            type = def.LocalizedDisplayName;
-        } else {
-            type = source.damageType.GetAsset() != null ? source.damageType.GetAsset().shortLabel : source.damageType.ToString();
-            if (def != null) {
-                var caliber = def.caliber.GetAsset();
-                type += " " + (caliber != null ? caliber.label : def.caliber.ToString()) + " " + def.projectileType;
-            }
-        }
-
-        PluginInstance<MessageController>.Instance.OnEnemyHit(type, Convert.ToInt32(dealt));
+        PluginInstance<MessageController>.Instance.OnEnemyHit(ClientHitFeedback.DescribeDamage(source.damageType, source.sourceWeapon, source.melee), Convert.ToInt32(dealt));
     }
 }

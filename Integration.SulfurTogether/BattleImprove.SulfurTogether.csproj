@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <!-- The optional SULFUR Together adapter: its own BepInEx plugin, shipped in the same package as
+         BattleImprove. BattleImprove.dll has no reference to this project or to SULFUR Together. Building
+         this project also builds BattleImprove, so packaging goes through this project. -->
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <AssemblyName>BattleImprove.SulfurTogether</AssemblyName>
+        <RootNamespace>BattleImprove.SulfurTogether</RootNamespace>
+        <LangVersion>latest</LangVersion>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <RestoreAdditionalProjectSources>
+            https://api.nuget.org/v3/index.json;
+            https://nuget.bepinex.dev/v3/index.json
+        </RestoreAdditionalProjectSources>
+        <SulfurManaged Condition="'$(SulfurManaged)' == ''">D:\SteamLibrary\steamapps\common\SULFUR\Sulfur_Data\Managed</SulfurManaged>
+        <SulfurTogetherDir Condition="'$(SulfurTogetherDir)' == ''">$(MSBuildThisFileDirectory)..\..\SULFUR Together</SulfurTogetherDir>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="BepInEx.Core" Version="5.*" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\BattleImprove.csproj" Private="false" />
+        <Reference Include="$(SulfurManaged)\UnityEngine.dll" Private="false" />
+        <Reference Include="$(SulfurManaged)\UnityEngine.CoreModule.dll" Private="false" />
+        <!-- Compile-time only: at run time the installed SULFUR Together provides this assembly. -->
+        <Reference Include="SULFUR Together">
+            <HintPath>$(SulfurTogetherDir)\bin\Release\net472\SULFUR Together.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
+
+    <Target Name="DeployToThunderstore" AfterTargets="Build" Condition="'$(DeployToSulfurProfile)' == 'true'">
+        <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)\..\thunderstore" />
+    </Target>
+
+</Project>

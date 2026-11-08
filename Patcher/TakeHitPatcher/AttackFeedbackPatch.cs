@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using BattleImprove.Integration;
 using HarmonyLib;
 using PerfectRandom.Sulfur.Core;
 using PerfectRandom.Sulfur.Core.Units;
@@ -25,9 +26,15 @@ public class AttackFeedbackPatch {
         LastHitWeapon = new Dictionary<Unit, Weapon>();
     }
 
-    // Only react to damage dealt by the player.
-    protected static bool TargetCheck(DamageSourceData source) {
-        return source.sourceUnit != null && source.sourceUnit.isPlayer;
+    // Only react to damage dealt by the player. While the host settles another player's hit, damage the
+    // game deals from inside it can still name the host's own player as the source.
+    internal static bool TargetCheck(DamageSourceData source) {
+        return source.sourceUnit != null && source.sourceUnit.isPlayer && !CoopCombat.IsResolvingRemoteHit;
+    }
+
+    // A co-op client's hit skips the game's method and comes back from the host through ClientHitFeedback.
+    internal static bool IsReportedByHost(bool runOriginal) {
+        return !runOriginal && CoopCombat.ClientHitsReported;
     }
 
     /// <summary>

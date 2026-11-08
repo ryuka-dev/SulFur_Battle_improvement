@@ -15,7 +15,8 @@ public class CrossHairPatch : AttackFeedbackPatch {
         __state = WasAliveBeforeHit(__instance);
     }
 
-    private static void Postfix(Npc __instance, ref DamageSourceData source, bool __state) {
+    private static void Postfix(Npc __instance, ref DamageSourceData source, bool __state, bool __runOriginal) {
+        if (IsReportedByHost(__runOriginal)) return;
         if (!Config.EnableXCrossHair.Value) return;
         if (PluginInstance<xCrossHair>.Instance == null) return;
         if (!TargetCheck(source)) return;
