@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.10
+SULFUR Together: a joining player's damage numbers now come from the host, so they include crits, headshots and resistances, and they're right against bosses too. Hit sounds and the hit crosshair now wait for the host to confirm the hit. This needs SULFUR Together 1.7.0 or newer. Older versions keep the estimate from 1.5.9.
+
+When a joining player's hit sets off extra damage, such as Crusader, the host no longer gets a damage number or kill banner for it.
+
+The package has a new file, BattleImprove.SulfurTogether.dll, that connects this mod to SULFUR Together. If you install by hand, copy it too. Without SULFUR Together you'll see one error about it in the log, and you can ignore that.
+
+Traditional Chinese players now get the Chinese menu instead of English.
+
 ## 1.5.9
 Experience share no longer gives XP to a max rank weapon. The game has left those weapons out of the XP distribution since 1.0; this also respects the rank cap of Enchantments Unbound.
 
