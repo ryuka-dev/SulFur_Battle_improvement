@@ -25,6 +25,8 @@ public class MenuController : PluginInstance<MenuController> {
     }
 
     private void Start() {
+        // The menu windows are laid out in 1080p pixels; UrGUI draws them at this scale.
+        UWindow.SetGuiScaleProvider(() => UiScale.Menu);
         StartCoroutine(UpdateChecker.CheckForUpdate(() =>
             this.gameObject.AddComponent<WindowUpdateCheck>().SetController(this)));
         InitWindow();
@@ -35,6 +37,7 @@ public class MenuController : PluginInstance<MenuController> {
     }
 
     protected override void OnDestroy() {
+        UWindow.SetGuiScaleProvider(null);
         if (Plugin.i18n != null) Plugin.i18n.LanguageChanged -= OnLanguageChanged;
         base.OnDestroy();
     }

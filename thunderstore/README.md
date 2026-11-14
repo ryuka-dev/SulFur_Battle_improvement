@@ -40,6 +40,7 @@ Keep the ``lang`` folder next to the DLL when installing by hand; without it the
 
 ## Configurable
 - In Game config menu, default open key is F1
+- Size of the combat HUD and of the F1 menu. Both already grow with your screen resolution, and the combat HUD also follows the game's own HUD size setting.
 - Volume and distance of the hit sound.
 - Color of the hitmarker.
 - Volume of the kill message.

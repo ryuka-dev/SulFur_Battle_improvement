@@ -34,6 +34,7 @@ Every time you gain some experience on current weapon, your second weapon will a
 
 ## Configurable
 - In Game config menu, default open key is F1
+- Size of the combat HUD and of the F1 menu. Both already grow with your screen resolution, and the combat HUD also follows the game's own HUD size setting.
 - Feature toggles, under `Feature Toggles` in that menu: every feature can be switched on or off
   without leaving the game. The menu edits the same `BepInEx/config` file a mod manager or an
   external config UI would, so existing settings are read, not replaced. Combat feedback, the health

@@ -47,6 +47,7 @@ namespace UrGUI.UWindow
         private List<float> _nextLineRatios = new List<float>(0);
 
         private bool _isDragging;
+        private Vector2 _dragLastMouse;
 
         private float _nextControlY;
         private List<WControl> _controls;
@@ -152,6 +153,7 @@ namespace UrGUI.UWindow
                     {
                         _isDragging = true;
                         AnyWindowDragging = true;
+                        _dragLastMouse = e.mousePosition;
                     }
                     else if (e.type == EventType.MouseUp)
                     {
@@ -159,19 +161,24 @@ namespace UrGUI.UWindow
                         AnyWindowDragging = false;
                     }
 
+                    // Moved by the change of the pointer position, which Unity maps through GUI.matrix, so
+                    // the window follows the pointer at any GUI scale.
                     if (e.type == EventType.MouseDrag && _isDragging)
                     {
-                        X += e.delta.x;
-                        Y += e.delta.y;
+                        X += e.mousePosition.x - _dragLastMouse.x;
+                        Y += e.mousePosition.y - _dragLastMouse.y;
+                        _dragLastMouse = e.mousePosition;
                     }
                 }
             }
 
-            // check if window isn't outside of screen
+            // check if window isn't outside of screen (in GUI units, i.e. at the current GUI scale)
+            var viewWidth = ViewWidth;
+            var viewHeight = ViewHeight;
+            if (X + Width > viewWidth) X = viewWidth - Width;
+            if (Y + Height > viewHeight) Y = viewHeight - Height;
             if (X < 0) X = 0;
             if (Y < 0) Y = 0;
-            if (X + Width > Screen.width) X = Screen.width - Width;
-            if (Y + Height > Screen.height) Y = Screen.height - Height;
 
             // reset nextControlY
             _nextControlY = Y + _controlHeight + _margin;
@@ -375,6 +382,17 @@ namespace UrGUI.UWindow
         public static bool RestoreGlobalDefaultSkin()
         {
             return LoadGlobalSkin_internal(DefaultSkin);
+        }
+
+        /// <summary>
+        /// Draw every window scaled by what <paramref name="provider"/> returns (1 = unscaled; null
+        /// removes it). Positions, sizes and the screen bounds windows are kept inside are all in GUI
+        /// units, so a window keeps its layout and only grows or shrinks on screen. The provider is
+        /// asked once per frame, and not while a control or a window is being dragged.
+        /// </summary>
+        public static void SetGuiScaleProvider(System.Func<float> provider)
+        {
+            ScaleProvider = provider;
         }
 
         /// <summary>

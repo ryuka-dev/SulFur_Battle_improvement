@@ -122,6 +122,8 @@ namespace UrGUI.UWindow
         {
             public readonly System.Action<float> OnValueChanged;
             public float Value;
+            /// <summary>When above 0, the value snaps to multiples of it (the shown number matches what is reported).</summary>
+            public float Step;
 
             private float _min, _max;
             private bool _numberIndicator, _labelOnLeft;
@@ -144,7 +146,11 @@ namespace UrGUI.UWindow
             internal override void Draw(Rect r)
             {
                 var newValue = UControls.LabelSlider(r, DisplayedString, Value, _min, _max, _numberIndicator, _numberIndicatorFormat, _labelOnLeft, 5f);
-                
+                // Only a value the slider moved is snapped: a value set from outside that is off the grid
+                // (a hand-edited config) is shown as it is and reported only once it is dragged.
+                if (Step > 0f && !newValue.Equals(Value))
+                    newValue = Mathf.Clamp(Mathf.Round(newValue / Step) * Step, _min, _max);
+
                 // handle onChangedValue event 
                 if (!newValue.Equals(Value))
                     OnValueChanged(newValue);

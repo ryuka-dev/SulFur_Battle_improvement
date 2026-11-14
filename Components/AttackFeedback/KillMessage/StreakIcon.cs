@@ -36,7 +36,11 @@ public class StreakIcon : MonoBehaviour {
 
     private void Update() {
         if (TargetPosition) {
-            this.transform.position = Vector3.MoveTowards(this.transform.position, TargetPosition.transform.position, 200f * Time.deltaTime);
+            // 200 canvas units a second: positions here are screen pixels, so the canvas scale keeps
+            // the pace the same at any HUD size.
+            var parent = this.transform.parent;
+            var scale = parent != null ? Mathf.Abs(parent.lossyScale.y) : 1f;
+            this.transform.position = Vector3.MoveTowards(this.transform.position, TargetPosition.transform.position, 200f * scale * Time.deltaTime);
         }
     }
     

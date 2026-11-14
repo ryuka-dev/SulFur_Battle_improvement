@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BepInEx.Configuration;
+using UnityEngine;
 using UrGUI.UWindow;
 
 namespace BattleImprove.UI.InGame;
@@ -15,6 +16,7 @@ namespace BattleImprove.UI.InGame;
 /// </summary>
 public class WindowToggle : WindowBase {
     private readonly List<(ConfigEntry<bool> Entry, UWindowControls.WToggle Control)> bindings = new();
+    private readonly List<(ConfigEntry<float> Entry, UWindowControls.WSlider Control)> sliders = new();
 
     protected override void Init() {
         window = UWindow.Begin(i18n.GetText("Toggle", "Feature Toggles"));
@@ -33,6 +35,13 @@ public class WindowToggle : WindowBase {
         Bind("Toggle.healthbar", "Enemy Health Bar", Config.EnableHealthBar);
         Bind("Toggle.expshare", "Experience Share", Config.EnableExpShare);
         Bind("Toggle.lootvfx", "Loot Drop VFX", Config.EnableLoopDropVFX);
+        window.Space();
+
+        // Both already follow the screen size (the HUD also the game's own HUD size setting); these
+        // multiply on top. The menu one is taken when the slider is let go, not while it is dragged.
+        window.Label(i18n.GetText("Toggle.size", "Size"));
+        BindScale("Toggle.hudscale", "Combat HUD", Config.HudScale, Config.HudScaleMax);
+        BindScale("Toggle.menuscale", "This Menu", Config.MenuScale, Config.MenuScaleMax);
         window.Space();
 
         // Whether these are patched at all is decided once, during Awake: two of them rewrite IL, and
@@ -54,6 +63,9 @@ public class WindowToggle : WindowBase {
             foreach (var (entry, control) in bindings) {
                 control.Value = entry.Value;
             }
+            foreach (var (entry, control) in sliders) {
+                control.Value = entry.Value;
+            }
         }
 
         base.Toggle();
@@ -68,6 +80,20 @@ public class WindowToggle : WindowBase {
         window.Label(label);
         var control = window.Toggle(string.Empty, value => Apply(entry, value), entry.Value);
         bindings.Add((entry, control));
+    }
+
+    private void BindScale(string key, string english, ConfigEntry<float> entry, float max) {
+        var control = window.Slider(i18n.GetText(key, english), value => Apply(entry, value), entry.Value,
+            Config.ScaleMin, max, true, "0.00");
+        // Snapping keeps the number shown equal to the value stored, and limits a drag to one config
+        // write per step instead of one per frame.
+        control.Step = Config.ScaleStep;
+        sliders.Add((entry, control));
+    }
+
+    private static void Apply(ConfigEntry<float> entry, float value) {
+        if (Mathf.Approximately(entry.Value, value)) return;
+        entry.Value = value;
     }
 
     private static void Apply(ConfigEntry<bool> entry, bool value) {

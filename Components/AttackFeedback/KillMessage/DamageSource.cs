@@ -17,13 +17,20 @@ public class DamageSource : MonoBehaviour {
     }
 
     private void Update() {
-        this.transform.position = Vector3.MoveTowards(this.transform.position, placeholder.transform.position, 200f * Time.deltaTime);
+        // 200 canvas units a second: positions here are screen pixels, so the canvas scale keeps the
+        // pace the same at any HUD size.
+        this.transform.position = Vector3.MoveTowards(this.transform.position, placeholder.transform.position, 200f * CanvasScale() * Time.deltaTime);
         
         timer += Time.deltaTime;
         if (timer > 5f) {
             Destroy(placeholder);
             Destroy(gameObject);
         }
+    }
+
+    private float CanvasScale() {
+        var parent = this.transform.parent;
+        return parent != null ? Mathf.Abs(parent.lossyScale.y) : 1f;
     }
 
     public void InitMessage(string type, int damage, GameObject placeholder) {

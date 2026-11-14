@@ -17,6 +17,13 @@ Changes against upstream:
 - `UWindow.Space`, `Label`, `Button`, `Toggle`, `Slider`, `TextField`, `IntField`, `FloatField`,
   `ColorPicker`, `DropDown` and `Separator` return the control they add; `UWindowControls` and its control
   classes are public (as in the DLL shipped up to 1.5.10).
+- GUI scale: `UWindow.SetGuiScaleProvider` sets a scale that `UWindowManager.OnBehaviourGUI` applies through
+  `GUI.matrix`. The scale is read once per frame, never while the left mouse button is down, and never above what
+  lets the largest window fit the screen (but not below 1 for that). Windows are kept inside the screen in
+  GUI units, and a dragged window follows the pointer position instead of `Event.delta`.
+- `WSlider.Step` snaps a value the slider moved; a value set from outside is left as it is.
+- A window larger than the screen is pinned to its top-left corner; it used to be pushed past it, so the
+  bottom stayed visible and the top did not.
 - A duplicate `using UnityEngine;` in `UWindowManager.cs` is removed.
 
 Not a change of code, but of behaviour: the shipped DLL was a Debug build, so its logger also printed Info

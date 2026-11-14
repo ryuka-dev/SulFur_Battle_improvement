@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using BattleImprove.Components;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -66,6 +67,7 @@ public static class PrefabManager {
             return;
         }
         TmpFontFixer.Apply(Plugin.IndicatorGameObject);
+        HudCanvasScale.AttachTo(Plugin.IndicatorGameObject);
         // messageStyle comes from the player's save file, so it may name a style this build no longer has.
         if (!DataManager.KillMessageStyle.TryGetValue(DataManager.AttackFeedbackData.messageStyle, out var style)) {
             style = DataManager.KillMessageStyle[0];
@@ -85,5 +87,6 @@ public static class PrefabManager {
             return;
         }
         TmpFontFixer.Apply(styleObject);
+        HudCanvasScale.AttachTo(styleObject);
     }
 }
