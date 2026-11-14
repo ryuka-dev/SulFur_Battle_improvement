@@ -76,5 +76,5 @@ That's the co-op adapter being skipped because SULFUR Together isn't installed. 
 # Copyright
 Audio/Texture: Electronic Arts, DICE
 
-UI library: Hirashi3630/UrGUI
+UI library: [Hirashi3630/UrGUI](https://github.com/Hirashi3630/UrGUI) (MIT licence), built into the plugin
 

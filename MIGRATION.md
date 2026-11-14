@@ -25,7 +25,6 @@ The following three categories are not in git (copyrighted assets / binaries / d
 | Path | Description | Source |
 |------|-------------|--------|
 | `Assets/battle_improve` | Custom AssetBundle (UI art + kill sounds, contains copyrighted assets) | Extract from the embedded resource of an old release DLL, or rebuild in Unity |
-| `libs/UrGUI.dll` | Third-party open-source IMGUI library (used by the F1 menu) | Build from the UrGUI project, or extract from an old release |
 | `_decompiled/` | Decompiled game DLL cache (reference only) | See section 2 |
 
 The game's own managed DLLs do not need to be copied; the csproj references the `Managed` directory directly.
@@ -38,11 +37,12 @@ The game's own managed DLLs do not need to be copied; the csproj references the 
   - `$(SulfurManaged)\UnityEngine*.dll`, `$(SulfurManaged)\Unity.*.dll` (this glob also pulls in **Unity.InputSystem.dll**, needed in section 4)
   - `PerfectRandom.Sulfur.Core.dll`, `PerfectRandom.Sulfur.Gameplay.dll`
   - `Sonity.Public.Runtime.dll`, `EasySave3.dll`
-  - `libs\UrGUI.dll` (`Private="true"`, must ship with the plugin)
 - Embedded resources (the LogicalName must match the runtime lookup name):
   - `Assets\battle_improve` → `BattleImprove.Assets.battle_improve`
+  - `ThirdParty\UrGUI\Skins\main` → `UrGUI.Skins.main` (the F1 menu's skin)
   - `Lang\English.lang`, `Lang\ChineseSimplified.lang`
-- Excluded from compilation: `_decompiled\**`, `UI\UrGUI\**` (submodule source is not compiled; `libs\UrGUI.dll` is used instead)
+- The F1 menu library, UrGUI, is compiled into the plugin from `ThirdParty/UrGUI` (its README lists the changes against upstream). Until 1.5.10 it was a separate `libs/UrGUI.dll`.
+- Excluded from compilation: `_decompiled\**`, `UI\UrGUI\**` (an optional local clone of upstream UrGUI, for comparison only)
 
 ### 1.3 Build and deploy
 
@@ -50,7 +50,7 @@ The game's own managed DLLs do not need to be copied; the csproj references the 
 dotnet build BattleImprove.csproj -c Release
 ```
 
-Copy the output `bin/Release/BattleImprove.dll` (plus `UrGUI.dll`) into `BepInEx/plugins/`. This port used Gale for management, deploying to the profile's `BepInEx/plugins/BattleImprove/`.
+Copy the output `bin/Release/BattleImprove.dll` into `BepInEx/plugins/`. This port used Gale for management, deploying to the profile's `BepInEx/plugins/BattleImprove/`.
 
 ---
 
@@ -193,8 +193,7 @@ Each item gives: symptom → root cause → fix → verification.
 
 ## 5. Remaining items and caveats
 
-- **Copyrighted assets not committed**: `Assets/battle_improve` (UI art + kill sounds) and `libs/UrGUI.dll` are gitignored; after cloning you must supply them to build. `EasySave3.dll` is referenced by the csproj from the game's `Managed` directory and is not committed.
-- **UI/UrGUI submodule**: `.gitmodules` declares it, but it was never registered as a gitlink; an existing local clone is enough to build (the csproj uses `libs/UrGUI.dll` and does not compile the submodule source). To let others get it via `git submodule update --init`, the submodule needs to be registered properly.
+- **Copyrighted assets not committed**: `Assets/battle_improve` (UI art + kill sounds) is gitignored; after cloning you must supply it to build. `EasySave3.dll` is referenced by the csproj from the game's `Managed` directory and is not committed.
 - **Harmony003 warnings**: the build produces 5, all analyzer false positives (method calls / struct reads inside ternary expressions misread as parameter assignment); harmless.
 - **Bullets-through-corpses trade-off**: see section 4, item 3 (corpse collider disabled, can't shatter a frozen corpse).
 - **The decompile cache** `_decompiled/` is reference-only and gitignored.

@@ -4,9 +4,13 @@ obj/
 
 # Copyrighted / binary build inputs — supply these locally, never commit them.
 # Assets/battle_improve is the custom AssetBundle (UI art + kill sounds) and must be
-# obtained/rebuilt separately; libs/ holds prebuilt third-party binaries (UrGUI.dll).
+# obtained/rebuilt separately. libs/ is no longer needed to build (the menu library is
+# compiled from ThirdParty/UrGUI) and stays ignored for old local checkouts.
 Assets/
 libs/
+
+# Local clone of the upstream menu library, kept only to compare against ThirdParty/UrGUI.
+UI/UrGUI/
 
 # Thunderstore packaging: built binaries and packaged archives, not committed.
 thunderstore/*.dll

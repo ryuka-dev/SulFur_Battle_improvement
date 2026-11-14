@@ -34,7 +34,6 @@
         <Reference Include="$(SulfurManaged)\EasySave3.dll" Private="false" />
         <!-- I2 Localization: the game's language setting is the plugin's language setting. -->
         <Reference Include="$(SulfurManaged)\I2AsmDef.dll" Private="false" />
-        <Reference Include="libs\UrGUI.dll" Private="true" />
     </ItemGroup>
 
     <!-- Embedded resources (logical names must match the runtime lookups in PrefabManager).
@@ -42,6 +41,8 @@
          where SULFUR's localization helper looks for it. -->
     <ItemGroup>
         <EmbeddedResource Include="Assets\battle_improve" LogicalName="BattleImprove.Assets.battle_improve" />
+        <!-- The menu library's default skin, under the name UWindowManagerBehaviour looks it up by. -->
+        <EmbeddedResource Include="ThirdParty\UrGUI\Skins\main" LogicalName="UrGUI.Skins.main" />
     </ItemGroup>
 
     <!-- Keep the decompiled game source and scratch out of the build. -->
@@ -51,11 +52,12 @@
         <Compile Remove="Integration.SulfurTogether\**\*.cs" />
     </ItemGroup>
 
-    <!-- Stage the freshly built plugin and its bundled dependency into the Thunderstore package folder so
-         the packaging step zips the current build, not a stale copy. Enabled with -p:DeployToSulfurProfile=true. -->
+    <!-- Stage the freshly built plugin into the Thunderstore package folder so the packaging step zips the
+         current build, not a stale copy. Enabled with -p:DeployToSulfurProfile=true. The menu library is
+         compiled into the plugin (ThirdParty\UrGUI): a second DLL that a manual install could leave out made
+         every save load hang in the game's type scan. -->
     <Target Name="DeployToThunderstore" AfterTargets="Build" Condition="'$(DeployToSulfurProfile)' == 'true'">
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)\thunderstore" />
-        <Copy SourceFiles="$(MSBuildProjectDirectory)\libs\UrGUI.dll" DestinationFolder="$(MSBuildProjectDirectory)\thunderstore" />
         <!-- The package carries the optional co-op adapter too. It references this project, so the nested
              build is told not to come back here. Restore runs on its own, with a property of its own, so
              the build that follows evaluates the project with what the restore generated. -->
