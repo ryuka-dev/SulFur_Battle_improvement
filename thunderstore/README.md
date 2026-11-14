@@ -34,7 +34,7 @@ Every time you gain some experience on current weapon, your second weapon will a
 Reverse mouse scroll.
 
 ## Language
-The menu follows the language you picked in the game's own options and changes with it. All 14 languages the game ships are included. Translations other than English and Simplified Chinese are machine-assisted - corrections are welcome.
+The menu follows the language you picked in the game's own options and changes with it. All 15 languages the game ships are included. Translations other than English and Simplified Chinese are machine-assisted - corrections are welcome.
 
 Keep the ``lang`` folder next to the DLL when installing by hand; without it the menu simply falls back to English.
 
