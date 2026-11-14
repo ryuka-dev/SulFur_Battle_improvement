@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.6.0
+The hit crosshair, kill messages and damage numbers now scale with your screen. They used to be drawn at a fixed pixel size, so on a 1440p or 4K screen they came out smaller than the game's own HUD. They now match the game's HUD, including its HUD size setting under accessibility. At 1080p with that setting at its default they look the same as before. If a large HUD size would push the kill messages off the bottom of the screen, they stop growing at the largest size that still fits.
+
+The F1 menu now grows on screens taller than 1080 pixels. On 1080p and smaller screens it's unchanged.
+
+Both sizes can be adjusted further in the F1 menu under Feature Toggles > Size, or with `HudScale` and `MenuScale` in the config file.
+
+Traditional Chinese now has its own translation. It used to show the Simplified Chinese text.
+
+UrGUI.dll is no longer a separate file. The menu library is now built into BattleImprove.dll. Before, if UrGUI.dll was missing from a manual install, every save got stuck on the loading screen. If you install by hand, you can delete the old UrGUI.dll.
+
 ## 1.5.10
 SULFUR Together: a joining player's damage numbers now come from the host, so they include crits, headshots and resistances, and they're right against bosses too. Hit sounds and the hit crosshair now wait for the host to confirm the hit. This needs SULFUR Together 1.7.0 or newer. Older versions keep the estimate from 1.5.9.
 

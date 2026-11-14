@@ -23,7 +23,7 @@ namespace BattleImprove.SulfurTogether;
 public sealed class SulfurTogetherPlugin : BaseUnityPlugin {
     private const string PluginGuid = "ryuka.sulfur.battle_improve_sulfur_together";
     private const string PluginName = "BattleImprove - SULFUR Together Adapter";
-    private const string PluginVersion = "1.5.10";
+    private const string PluginVersion = "1.6.0";
     private const string BattleImproveGuid = "BattleImprove";
     private const string SulfurTogetherGuid = "com.ryuka.sulfur.together";
     private const int RequiredApiVersion = 1;
